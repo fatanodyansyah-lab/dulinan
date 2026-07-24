@@ -20,6 +20,19 @@ npx serve .
 
 lalu buka `http://localhost:3000`.
 
+## Game: Kucing Es Krim (`games/kucing_es_krim/`)
+
+Arcade endless survival: geser kucing kiri/kanan untuk menangkap es krim
+yang jatuh, hindari bom dan ikan busuk. 3 nyawa, kecepatan naik terus
+tanpa henti, musik loop. Single-file (`index.html`, canvas 2D, semua art
+digambar prosedural) — dibangun dari prototype desain asli yang sudah
+production-ready, hanya ditambah path aset lokal (`assets/music.mp3`) dan
+tombol kembali ke hub (ikon rumah kecil di HUD, sebelah tombol mute).
+
+Skor terbaik tersimpan di `localStorage` (`kucing_es_best`). Kontrol:
+drag di layar (cone mengikuti jari), tahan tombol ◀/▶ di pojok bawah,
+atau A/D / panah kiri-kanan + Space/Enter di keyboard.
+
 ## Game: Konser Kelinci (`games/konser_kelinci/`)
 
 Rhythm game ala Guitar Hero: gem warna jatuh di jalur 3 lajur bertampilan

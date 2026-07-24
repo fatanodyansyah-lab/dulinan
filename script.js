@@ -12,6 +12,7 @@
   const GAMES = [
     { emoji: '🐱', name: 'Kucing Es Krim', tag: 'Arcade', url: 'games/kucing_es_krim/index.html' },
     { emoji: '🐰', name: 'Konser Kelinci', tag: 'Musik', url: 'games/konser_kelinci/index.html' },
+    { emoji: '🎤', name: 'K-Pop Hunter Fashion', tag: 'Dress-Up', url: 'games/kpop_hunter_fashion/index.html' },
   ];
 
   const homeScreen = document.getElementById('home-screen');

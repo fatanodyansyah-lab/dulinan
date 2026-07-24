@@ -60,6 +60,27 @@ Semua ukuran/warna/timing mengikuti design tokens di handoff persis
 (fall 2.6s, hit window ±0.22s, miss grace 0.25s, dst) — bisa diubah di
 3 konstanta atas `game.js`: `TEMPO`, `FALL_SECONDS`, `SHOW_KEYS`.
 
+## Game: K-Pop Hunter Fashion (`games/kpop_hunter_fashion/`)
+
+Dress-up game mobile-first (portrait): style tiga idol original **Rumi, Mira,
+Zoey** lewat 9 kategori wardrobe (rambut, atasan, bawahan, gaun, sepatu,
+anting, kalung, kacamata, mic — 4 item tiap kategori), lalu saksikan trio
+tampil di panggung encore dengan spotlight, confetti, dan fanfare. UI copy
+campuran Bahasa Indonesia + istilah K-Pop. Semua karakter & clothing digambar
+**inline SVG prosedural** (tanpa file gambar).
+
+Struktur:
+
+- `index.html` — tiga layar (start / dress-up / stage) + tombol home ke hub.
+- `style.css` — design tokens hifi (neon purple gradient, Baloo 2, keyframes
+  bob/sway/cfall/glowp/popin).
+- `game.js` — state machine, draw functions per kategori, aturan dress vs
+  top/bottom, Web Audio (blip + fanfare + loop musik sintetis), toggle item.
+- `assets/Baloo2.ttf` + `Baloo2-OFL.txt` — font lokal (offline-friendly).
+
+Alur: Start → Dress(Rumi → Mira → Zoey) → Stage. Dari stage, ketuk gadis
+untuk edit ulang lalu "Kembali ke Panggung". "Main Lagi" reset semua outfit.
+
 ## Menambah game baru
 
 1. Buat folder `games/<nama_game>/` dengan `index.html` sendiri (boleh

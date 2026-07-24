@@ -81,6 +81,29 @@ Struktur:
 Alur: Start → Dress(Rumi → Mira → Zoey) → Stage. Dari stage, ketuk gadis
 untuk edit ulang lalu "Kembali ke Panggung". "Main Lagi" reset semua outfit.
 
+## Game: Golden Piano Tiles (`games/golden_piano_tiles/`)
+
+Rhythm/tap game ala Piano Tiles bertema emas: ubin jatuh di 3 lajur
+mengikuti irama lagu; ketuk saat ubin melewati garis hit. Ubin panjang
+(TAHAN) harus ditekan & ditahan sampai ujung. Miss (ubin lewat tanpa
+ketuk) mengakhiri run; selesai lagu = menang. Combo, progress bar lagu,
+skor terbaik di `localStorage` (`goldenTilesHigh`). UI Bahasa Indonesia.
+
+Struktur:
+
+- `index.html` — menu, HUD, gameplay, game-over + tombol home ke hub.
+- `style.css` — design tokens hifi (ungu/emas, Baloo 2, floatY/comboPop/
+  popIn/shake).
+- `game.js` — game loop `requestAnimationFrame` sinkron ke
+  `audio.currentTime`, beatmap pattern-based (BPM 100), short + hold
+  tiles, Web Audio blip hit/miss, particle burst.
+- `assets/background.mp4` — video latar muted loop.
+- `assets/golden-song.mp3` — track utama (dimainkan saat MAIN).
+- `assets/Baloo2.ttf` + `Baloo2-OFL.txt` — font lokal.
+
+Kontrol: ketuk 3 zona layar (pointer), atau A/S/D (1/2/3) di keyboard.
+Space/Enter memulai ulang dari menu / game over.
+
 ## Menambah game baru
 
 1. Buat folder `games/<nama_game>/` dengan `index.html` sendiri (boleh

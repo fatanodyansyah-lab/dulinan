@@ -332,7 +332,7 @@ function toGame(e){
 function pointerDown(e){
   e.preventDefault();
   const {x,y}=toGame(e);
-  if(x>366&&x<414&&y>12&&y<68){window.location.href='../../site/index.html';return;}
+  if(x>366&&x<414&&y>12&&y<68){window.location.href='../../index.html';return;}
   if(x>W-66&&y>12&&y<68){muted=!muted;if(muted)music.pause();else tryMusic();return;}
   if(state!=='play'){reset();state='play';tryMusic();return;}
   const by=H-92;

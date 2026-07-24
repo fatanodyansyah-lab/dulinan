@@ -267,7 +267,7 @@ document.querySelectorAll('.songBtn').forEach((btn) => {
   btn.addEventListener('click', () => startGame(btn.dataset.song));
 });
 $('replayBtn').addEventListener('click', backToMenu);
-$('homeBtn').addEventListener('click', () => { window.location.href = '../../site/index.html'; });
+$('homeBtn').addEventListener('click', () => { window.location.href = '../../index.html'; });
 
 buttons.forEach((btn) => {
   btn.addEventListener('pointerdown', (e) => { e.preventDefault(); hit(Number(btn.dataset.lane)); });

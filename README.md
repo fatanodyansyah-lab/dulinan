@@ -102,7 +102,10 @@ Struktur:
 - `assets/Baloo2.ttf` + `Baloo2-OFL.txt` — font lokal.
 
 Kontrol: ketuk 3 zona layar (pointer), atau A/S/D (1/2/3) di keyboard.
-Space/Enter memulai ulang dari menu / game over.
+Space/Enter memulai ulang dari menu / game over. Di menu ada opsi
+kecepatan **Lambat / Normal / Cepat** (default Lambat; tersimpan di
+`localStorage` `goldenTilesSpeed`) — mengatur playbackRate lagu, waktu
+jatuh ubin, kepadatan beatmap, dan hit window.
 
 ## Menambah game baru
 

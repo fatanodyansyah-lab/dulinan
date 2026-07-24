@@ -1,12 +1,78 @@
 (() => {
 'use strict';
 
-// ---------- constants (from design prototype) ----------
-const BPM = 100;
-const APPROACH = 2.0;   // seconds for tile head to reach hit line
-const HITWIN = 0.24;    // hit window around headTime
-const LATE = 0.20;      // miss if headTime + LATE passed without hit
+// ---------- block accidental zoom (iOS ignores user-scalable=no) ----------
+(function blockZoom() {
+  // pinch / multi-touch
+  const stopMulti = (e) => {
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+  };
+  document.addEventListener('touchstart', stopMulti, { passive: false });
+  document.addEventListener('touchmove', stopMulti, { passive: false });
+
+  // Safari gesture events
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((type) => {
+    document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+  });
+
+  // double-tap zoom (same spot only — rapid taps on different lanes still OK)
+  let lastTap = { t: 0, x: 0, y: 0 };
+  document.addEventListener('touchend', (e) => {
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+    const now = Date.now();
+    const x = touch.clientX;
+    const y = touch.clientY;
+    const dt = now - lastTap.t;
+    const dist = Math.hypot(x - lastTap.x, y - lastTap.y);
+    if (dt <= 300 && dist < 28) e.preventDefault();
+    lastTap = { t: now, x, y };
+  }, { passive: false });
+
+  // ctrl+wheel / trackpad pinch on desktop browsers
+  document.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) e.preventDefault();
+  }, { passive: false });
+})();
+
+// ---------- speed presets ----------
+// rate: song playbackRate (slower song = more time to react)
+// approach: seconds for a tile head to fall to the hit line
+// bpm: beatmap note density (lower = fewer notes)
+// hitWin / late: slightly looser windows on slower modes
+const SPEEDS = {
+  slow: {
+    id: 'slow',
+    label: 'Lambat',
+    rate: 0.7,
+    approach: 2.8,
+    bpm: 72,
+    hitWin: 0.32,
+    late: 0.28,
+  },
+  normal: {
+    id: 'normal',
+    label: 'Normal',
+    rate: 0.85,
+    approach: 2.3,
+    bpm: 88,
+    hitWin: 0.28,
+    late: 0.24,
+  },
+  fast: {
+    id: 'fast',
+    label: 'Cepat',
+    rate: 1.0,
+    approach: 2.0,
+    bpm: 100,
+    hitWin: 0.24,
+    late: 0.20,
+  },
+};
+
+const SPEED_KEY = 'goldenTilesSpeed';
 const HS_KEY = 'goldenTilesHigh';
+const DEFAULT_SPEED = 'slow';
 
 // ---------- DOM ----------
 const $ = (id) => document.getElementById(id);
@@ -18,6 +84,7 @@ const scoreValue = $('scoreValue');
 const comboValue = $('comboValue');
 const progressFill = $('progressFill');
 const comboPopup = $('comboPopup');
+const speedHud = $('speedHud');
 const hud = $('hud');
 const menuScreen = $('menuScreen');
 const overScreen = $('overScreen');
@@ -30,6 +97,8 @@ const bestComboLine = $('bestComboLine');
 const btnMain = $('btnMain');
 const btnReplay = $('btnReplay');
 const btnMenu = $('btnMenu');
+const speedPicker = $('speedPicker');
+const speedBtns = Array.from(document.querySelectorAll('.speedBtn'));
 const tapZones = Array.from(document.querySelectorAll('.tapZone'));
 
 // ---------- state ----------
@@ -40,6 +109,9 @@ let bestCombo = 0;
 let highScore = parseInt(localStorage.getItem(HS_KEY) || '0', 10);
 let isNewBest = false;
 let result = 'lost';
+
+let speedId = loadSpeedId();
+let speed = SPEEDS[speedId];
 
 let tiles = [];
 let beatmap = [];
@@ -52,8 +124,28 @@ let hitY = 640;
 let pps = 320;
 let tileH = 100;
 let leadIn = 2.6;
+let approach = 2.8;
+let hitWin = 0.32;
+let late = 0.28;
+let bpm = 72;
 let missBeat = null;
 let ac = null;
+
+function loadSpeedId() {
+  const saved = localStorage.getItem(SPEED_KEY);
+  if (saved && SPEEDS[saved]) return saved;
+  return DEFAULT_SPEED;
+}
+
+function setSpeed(id) {
+  if (!SPEEDS[id]) return;
+  speedId = id;
+  speed = SPEEDS[id];
+  localStorage.setItem(SPEED_KEY, id);
+  speedBtns.forEach((btn) => {
+    btn.classList.toggle('is-active', btn.dataset.speed === id);
+  });
+}
 
 // ---------- init ----------
 function refreshHighScoreUI() {
@@ -65,12 +157,20 @@ function refreshHighScoreUI() {
   }
 }
 
+function applySpeedParams() {
+  approach = speed.approach;
+  hitWin = speed.hitWin;
+  late = speed.late;
+  bpm = speed.bpm;
+  measure();
+}
+
 function measure() {
   H = tilesLayer.clientHeight || stage.clientHeight || 800;
   hitY = H * 0.80;
-  pps = hitY / APPROACH;
+  pps = hitY / approach;
   tileH = H * 0.13;
-  leadIn = APPROACH + 0.6;
+  leadIn = approach + 0.6;
 }
 
 song.addEventListener('loadedmetadata', () => {
@@ -85,6 +185,7 @@ try {
   if (vp && vp.catch) vp.catch(() => {});
 } catch (_) {}
 
+setSpeed(speedId);
 refreshHighScoreUI();
 
 // ---------- audio sfx ----------
@@ -119,9 +220,27 @@ function pickLane(prev) {
   return l;
 }
 
-function generateBeatmap() {
-  const spb = 60 / BPM;
-  const patterns = [
+function patternsForSpeed() {
+  // Slower modes use fewer half-beats so the chart feels calmer
+  if (speedId === 'slow') {
+    return [
+      [{ d: 1 }, { d: 1 }, { d: 1 }, { d: 1 }],
+      [{ d: 1 }, { d: 1 }, { d: 2, hold: true }],
+      [{ d: 2 }, { d: 1 }, { d: 1 }],
+      [{ d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 2, hold: true }],
+      [{ d: 1 }, { d: 1 }, { d: 1 }, { d: 2, hold: true }],
+    ];
+  }
+  if (speedId === 'normal') {
+    return [
+      [{ d: 1 }, { d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 1 }],
+      [{ d: 1 }, { d: 1 }, { d: 2, hold: true }],
+      [{ d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 1 }, { d: 1 }],
+      [{ d: 0.5 }, { d: 0.5 }, { d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 1 }],
+      [{ d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 2, hold: true }],
+    ];
+  }
+  return [
     [{ d: 1 }, { d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 1 }],
     [{ d: 0.5 }, { d: 0.5 }, { d: 0.5 }, { d: 0.5 }, { d: 2, hold: true }],
     [{ d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 1 }, { d: 1 }],
@@ -129,9 +248,16 @@ function generateBeatmap() {
     [{ d: 0.5 }, { d: 0.5 }, { d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 1 }],
     [{ d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 2, hold: true }],
   ];
+}
+
+function generateBeatmap() {
+  const spb = 60 / bpm;
+  const patterns = patternsForSpeed();
   const map = [];
   let t = leadIn;
   let prev = -1;
+  // songDur is intrinsic duration; playbackRate stretches real time but
+  // audio.currentTime still runs 0..duration, so end stays the same.
   const end = songDur - 2.5;
   while (t < end) {
     const pat = patterns[Math.floor(Math.random() * patterns.length)];
@@ -190,10 +316,10 @@ function createTileEl(b) {
 function updateHud() {
   scoreValue.textContent = String(score);
   comboValue.textContent = String(combo);
+  speedHud.textContent = speed.label;
   if (combo >= 5) {
     comboPopup.hidden = false;
     comboPopup.textContent = `${combo} combo!`;
-    // re-trigger animation
     comboPopup.style.animation = 'none';
     void comboPopup.offsetWidth;
     comboPopup.style.animation = 'comboPop 0.35s ease-out';
@@ -213,7 +339,7 @@ function setPhase(next) {
 // ---------- game control ----------
 function startGame() {
   initAudio();
-  measure();
+  applySpeedParams();
   tilesLayer.innerHTML = '';
   tiles = [];
   pressed = [false, false, false];
@@ -239,6 +365,8 @@ function startGame() {
 
   song.currentTime = 0;
   song.volume = 1;
+  song.playbackRate = speed.rate;
+  try { song.preservesPitch = true; } catch (_) {}
   song.onended = () => {
     if (phase === 'playing') endGame('win');
   };
@@ -255,6 +383,7 @@ function goMenu() {
   tiles = [];
   song.pause();
   song.currentTime = 0;
+  song.playbackRate = 1;
   setPhase('menu');
   refreshHighScoreUI();
 }
@@ -368,7 +497,7 @@ function laneDown(lane, e) {
   for (const b of tiles) {
     if (b.lane !== lane || b.done || b.hit || b.holding) continue;
     const diff = Math.abs(b.headTime - at);
-    if (diff <= HITWIN && diff < bestDiff) {
+    if (diff <= hitWin && diff < bestDiff) {
       best = b;
       bestDiff = diff;
     }
@@ -402,8 +531,7 @@ function loop() {
   if (phase !== 'playing') return;
   const at = song.currentTime || 0;
 
-  // spawn
-  while (spawnIdx < beatmap.length && beatmap[spawnIdx].headTime - at <= APPROACH + 0.5) {
+  while (spawnIdx < beatmap.length && beatmap[spawnIdx].headTime - at <= approach + 0.5) {
     const b = beatmap[spawnIdx];
     createTileEl(b);
     tiles.push(b);
@@ -425,7 +553,7 @@ function loop() {
       continue;
     }
 
-    if (!b.hit && !b.holding && at > b.headTime + LATE) {
+    if (!b.hit && !b.holding && at > b.headTime + late) {
       b.missed = true;
       lost = true;
       missBeat = b;
@@ -433,7 +561,6 @@ function loop() {
     }
   }
 
-  // recycle off-screen tiles
   tiles = tiles.filter((b) => {
     if (!b.el) return true;
     const bottomY = hitY + (at - b.headTime) * pps;
@@ -457,6 +584,19 @@ function loop() {
 }
 
 // ---------- wire events ----------
+speedBtns.forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSpeed(btn.dataset.speed);
+  });
+});
+
+// prevent speed picker taps from bubbling into accidental play
+if (speedPicker) {
+  speedPicker.addEventListener('pointerdown', (e) => e.stopPropagation());
+}
+
 btnMain.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   startGame();
@@ -481,7 +621,6 @@ tapZones.forEach((zone) => {
   zone.addEventListener('pointerleave', () => laneUp(lane));
 });
 
-// keyboard: A/S/D or 1/2/3
 const KEY_LANES = {
   KeyA: 0, KeyS: 1, KeyD: 2,
   Digit1: 0, Digit2: 1, Digit3: 2,
@@ -512,7 +651,6 @@ window.addEventListener('keyup', (e) => {
   if (lane !== undefined) laneUp(lane);
 });
 
-// remeasure on resize
 window.addEventListener('resize', () => {
   if (phase === 'playing') measure();
 });

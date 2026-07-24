@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Golden Piano Tiles</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -47,6 +49,12 @@
         <div class="hudLabel">COMBO</div>
       </div>
     </div>
+    <div class="hudSpeedRow">
+      <div class="hudChip hudChipSm">
+        <div id="speedHud" class="hudSpeed">Lambat</div>
+        <div class="hudLabel">TEMPO</div>
+      </div>
+    </div>
     <div class="progressTrack">
       <div id="progressFill" class="progressFill"></div>
     </div>
@@ -62,6 +70,14 @@
     <div class="instrCard">
       Ketuk ubin emas mengikuti irama lagu.<br>
       Ubin panjang: <b>tekan &amp; tahan</b> sampai ujung!
+    </div>
+    <div class="speedBlock">
+      <div class="speedLabel">Kecepatan</div>
+      <div id="speedPicker" class="speedPicker" role="group" aria-label="Pilih kecepatan">
+        <button type="button" class="speedBtn" data-speed="slow">Lambat</button>
+        <button type="button" class="speedBtn" data-speed="normal">Normal</button>
+        <button type="button" class="speedBtn" data-speed="fast">Cepat</button>
+      </div>
     </div>
     <div id="highScoreLine" class="highScoreLine" hidden>🏆 Skor tertinggi: 0</div>
     <button type="button" id="btnMain" class="btnGold">MAIN</button>

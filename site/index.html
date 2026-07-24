@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dulinan Space</title>
+<meta name="description" content="Dulinan Space — kumpulan permainan seru untuk anak-anak. Ayo pilih permainanmu!">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- soft space accents -->
+  <div class="deco-blob" aria-hidden="true"></div>
+  <div class="twinkle twinkle-1" aria-hidden="true">✦</div>
+  <div class="twinkle twinkle-2" aria-hidden="true">✦</div>
+  <div class="twinkle twinkle-3" aria-hidden="true">✦</div>
+
+  <!-- HOME SCREEN -->
+  <main class="home-screen" id="home-screen">
+    <header class="home-header">
+      <div class="mascot" aria-hidden="true">
+        <div class="mascot-face"></div>
+        <div class="mascot-eye mascot-eye-left"></div>
+        <div class="mascot-eye mascot-eye-right"></div>
+        <div class="mascot-pupil mascot-pupil-left"></div>
+        <div class="mascot-pupil mascot-pupil-right"></div>
+        <div class="mascot-mouth"></div>
+      </div>
+      <div class="title-block">
+        <h1 class="app-title">Dulinan Space</h1>
+        <p class="subtitle">Ayo pilih permainanmu! 🚀</p>
+      </div>
+    </header>
+
+    <section class="games-grid" id="games-grid" aria-label="Daftar permainan">
+      <!-- game cards injected by script.js -->
+    </section>
+  </main>
+
+  <!-- LOADING / PLAY SCREEN -->
+  <div class="play-overlay" id="play-overlay" hidden>
+    <button class="back-btn" id="back-btn" type="button">← Kembali</button>
+
+    <div class="loading-state" id="loading-state">
+      <div class="orbit-ring">
+        <div class="orbit-rotator">
+          <div class="orbit-star">⭐</div>
+        </div>
+        <div class="orbit-center" id="loading-emoji"></div>
+      </div>
+      <div class="play-game-name" id="loading-name"></div>
+      <p class="play-status">Sedang menyiapkan… 🎮</p>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="ready-state" id="ready-state" hidden>
+      <div class="ready-emoji" id="ready-emoji"></div>
+      <div class="play-game-name" id="ready-name"></div>
+      <p class="ready-copy">Permainan siap dimainkan!</p>
+      <button class="play-btn" id="play-btn" type="button">Main Sekarang</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

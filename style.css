@@ -351,6 +351,11 @@ button {
   cursor: pointer;
 }
 
+.play-btn:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
 /* ---------- animations ---------- */
 
 @keyframes floaty {

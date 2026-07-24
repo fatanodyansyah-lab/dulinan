@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Konser Kelinci</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <video id="bgVideo" src="assets/background-video.mp4" muted loop playsinline></video>
+  <div id="scrim"></div>
+
+  <div id="scoreCard" class="hudCard">
+    <div class="hudLabel" style="color:#FFD93D">SKOR</div>
+    <div id="scoreValue" class="hudValue">0</div>
+  </div>
+  <div id="comboCard" class="hudCard" style="right:12px;left:auto;border-color:#4DA8FF;display:none">
+    <div class="hudLabel" style="color:#4DA8FF">COMBO</div>
+    <div id="comboValue" class="hudValue">x0</div>
+  </div>
+
+  <button id="homeBtn" aria-label="Kembali ke menu utama">
+    <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" fill="#FFD93D"/></svg>
+  </button>
+
+  <div id="highwayWrap">
+    <div id="highway">
+      <div class="laneLine" style="left:33.33%"></div>
+      <div class="laneLine" style="left:66.66%"></div>
+      <div id="hitLine"></div>
+      <div class="receptor" style="left:calc(16.66% - 27px);border-color:#FF6B6B;background:rgba(255,107,107,.16);box-shadow:0 0 12px rgba(255,107,107,.5)"></div>
+      <div class="receptor" style="left:calc(50% - 27px);border-color:#FFD93D;background:rgba(255,217,61,.16);box-shadow:0 0 12px rgba(255,217,61,.5)"></div>
+      <div class="receptor" style="left:calc(83.33% - 27px);border-color:#4DA8FF;background:rgba(77,168,255,.16);box-shadow:0 0 12px rgba(77,168,255,.5)"></div>
+      <div id="notesLayer"></div>
+      <div id="burstsLayer"></div>
+    </div>
+  </div>
+
+  <div id="feedback"></div>
+
+  <div id="buttonRow">
+    <button class="tapBtn" data-lane="0" style="border-color:#FF6B6B;box-shadow:0 6px 0 rgba(0,0,0,.35), 0 0 16px rgba(255,107,107,.45)">
+      <span class="keyLabel">A</span><div class="glow"></div>
+    </button>
+    <button class="tapBtn" data-lane="1" style="border-color:#FFD93D;box-shadow:0 6px 0 rgba(0,0,0,.35), 0 0 16px rgba(255,217,61,.45)">
+      <span class="keyLabel">S</span><div class="glow"></div>
+    </button>
+    <button class="tapBtn" data-lane="2" style="border-color:#4DA8FF;box-shadow:0 6px 0 rgba(0,0,0,.35), 0 0 16px rgba(77,168,255,.45)">
+      <span class="keyLabel">D</span><div class="glow"></div>
+    </button>
+  </div>
+
+  <div id="startScreen" class="overlay">
+    <div class="title">Konser Kelinci</div>
+    <div class="instrCard">Tekan tombol warna saat lingkaran sampai di garis pelangi!</div>
+    <div class="pickLabel">Pilih lagu:</div>
+    <div id="songList">
+      <button class="songBtn" data-song="twinkle" style="background:#FF6B6B;color:#fff;box-shadow:0 6px 0 #b23e3e;animation:pulse 1.6s ease-in-out infinite">Bintang Kecil</button>
+      <button class="songBtn" data-song="mary" style="background:#FFD93D;color:#5a3c00;box-shadow:0 6px 0 #bda01f">Si Domba Kecil</button>
+      <button class="songBtn" data-song="farm" style="background:#4DA8FF;color:#fff;box-shadow:0 6px 0 #2a6db3">Pak Tani Punya Kandang</button>
+    </div>
+    <div class="hint">Pakai jari, atau tombol A - S - D di keyboard</div>
+  </div>
+
+  <div id="endScreen" class="overlay" style="display:none">
+    <div id="starsText" class="stars"></div>
+    <div id="resultLine" class="resultLine"></div>
+    <div id="finalScore" class="finalScore"></div>
+    <button id="replayBtn" class="pillBtn" style="background:#4DA8FF;box-shadow:0 8px 0 #2a6db3">Main Lagi</button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

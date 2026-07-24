@@ -7,17 +7,11 @@
     { bg: 'linear-gradient(135deg,#5dd6b0,#22b98a)', shadow: 'rgba(34,185,138,.4)', playColor: '#22b98a' },
   ];
 
+  // Each real game lives in games/<folder>/index.html — add a new entry here
+  // (emoji, name, tag, url) to list it on the home screen.
   const GAMES = [
-    { emoji: '🚀', name: 'Roket Meluncur', tag: 'Petualangan' },
-    { emoji: '🎨', name: 'Ayo Mewarnai', tag: 'Kreatif' },
-    { emoji: '🎵', name: 'Piano Ceria', tag: 'Musik' },
-    { emoji: '🪐', name: 'Jelajah Planet', tag: 'Petualangan' },
-    { emoji: '🖍️', name: 'Gambar Bebas', tag: 'Kreatif' },
-    { emoji: '🥁', name: 'Tabuh Drum', tag: 'Musik' },
-    { emoji: '⭐', name: 'Kejar Bintang', tag: 'Petualangan' },
-    { emoji: '🌈', name: 'Pelangi Warna', tag: 'Kreatif' },
-    { emoji: '🎸', name: 'Band Angkasa', tag: 'Musik' },
-    { emoji: '👽', name: 'Sahabat Alien', tag: 'Petualangan' },
+    { emoji: '🐱', name: 'Kucing Es Krim', tag: 'Arcade', url: 'games/kucing_es_krim/index.html' },
+    { emoji: '🐰', name: 'Konser Kelinci', tag: 'Musik', url: 'games/konser_kelinci/index.html' },
   ];
 
   const homeScreen = document.getElementById('home-screen');
@@ -96,6 +90,7 @@
     readyEmoji.textContent = current.emoji;
     readyName.textContent = current.name;
     playBtn.style.color = current.playColor;
+    playBtn.disabled = !current.url;
   }
 
   function goHome() {
@@ -109,9 +104,8 @@
 
   backBtn.addEventListener('click', goHome);
 
-  // Placeholder: in production this launches the actual game.
   playBtn.addEventListener('click', () => {
-    console.log('Main Sekarang ditekan untuk:', current && current.name);
+    if (current && current.url) window.location.href = current.url;
   });
 
   renderGrid();

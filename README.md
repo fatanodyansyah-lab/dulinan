@@ -1,58 +1,66 @@
-# Game Kucing
+# Dulinan Space
 
-Platform game anak-anak untuk mobile (Godot 4.x, portrait 480×854). Setiap game
-hidup di foldernya sendiri di bawah `games/`, jadi nanti tinggal menambah game
-baru + scene pemilih game (hub) tanpa mengubah game yang sudah ada.
+Platform game anak-anak untuk mobile, dibangun murni dengan **HTML/CSS/JS**
+(bukan engine) supaya gampang dibuka di browser mana pun atau dibungkus jadi
+APK dengan WebView (mis. Capacitor/Cordova) nanti. Tiap game hidup di
+folder sendiri di bawah `games/`, dipanggil dari halaman pemilih (`index.html`
+di root), yang bertema "Dulinan Space" — home screen bergaya playful/luar
+angkasa ringan (mascot robot, bintang berkelip), sesuai design handoff
+hifi. Rencana deploy: domain `dulinan.space` via GitHub Pages (lihat `CNAME`).
 
 ## Cara menjalankan
 
-1. Install [Godot 4.x](https://godotengine.org/download) (dites dengan 4.3, cukup versi standar, bukan .NET).
-2. Buka Godot → **Import** → pilih folder ini (`project.godot`).
-3. Tekan **F5** (Run Project). Di desktop, klik mouse dianggap sentuhan.
+Buka `index.html` langsung di browser (double-click cukup), atau jalankan
+server statis lokal supaya video & font ke-load tanpa batasan `file://`
+di sebagian browser:
 
-## Game: Kucing Es Krim (`games/kucing_es_krim/`)
+```
+npx serve .
+```
 
-Arcade endless survival: geser kucing untuk menangkap es krim, hindari bom dan
-ikan busuk. 3 nyawa, makin lama makin cepat. Skor terbaik tersimpan di
-`user://save.cfg`.
+lalu buka `http://localhost:3000`.
 
-Kontrol: drag di layar (cone mengikuti jari), tahan tombol ◀/▶ di pojok bawah,
-atau A/D / panah kiri-kanan + Space/Enter di keyboard.
+## Game: Konser Kelinci (`games/konser_kelinci/`)
+
+Rhythm game ala Guitar Hero: gem warna jatuh di jalur 3 lajur bertampilan
+3D (perspective + rotateX), pemain menekan tombol warna (atau tombol
+A/S/D di keyboard) saat gem sampai garis pelangi. Ada 3 lagu anak
+(Bintang Kecil, Si Domba Kecil, Pak Tani Punya Kandang), skor & combo,
+efek api saat kena, popup semangat ("Hebat!", dst), dan rating bintang
+di akhir lagu.
 
 Struktur:
 
-- `main.tscn` — scene utama; node `Shaker` menampung semua layer (untuk screen shake).
-- `scripts/main.gd` — state machine (START/PLAY/OVER), spawner, collision, skor/nyawa, input, musik, save.
-- `scripts/cat.gd` — kucing + tumpukan scoop di cone (easing, mood happy/sedih).
-- `scripts/falling_item.gd` — item jatuh (scoop/bom/ikan).
-- `scripts/background.gd`, `hud.gd`, `overlay.gd`, `particles.gd`, `popups.gd` — layer visual.
-- `scripts/draw_utils.gd` (`KDraw`) — helper gambar prosedural + palet warna.
+- `index.html` — markup semua layar (start/song-select, gameplay, end).
+- `style.css` — semua styling & animasi (langsung dari spec desain: warna,
+  gradient, box-shadow, keyframes `noteFall`/`pop`/`flameUp`/dst).
+- `game.js` — logic murni vanilla JS: penjadwalan lagu berbasis
+  `AudioContext.currentTime` (bukan `Date.now`, biar tidak drift), hit
+  detection (±0.22s), sintesis nada via Web Audio (osilator triangle +
+  sine oktaf, tanpa file sample), spawn note/burst effect, state machine.
+- `assets/background-video.mp4` — video latar loop dari handoff (kucing main gitar).
+- `assets/Baloo2.ttf` + `Baloo2-OFL.txt` — font Baloo 2 (variable font,
+  weight 600/700/800), di-host lokal (bukan Google Fonts CDN) supaya game
+  tetap tampil benar walau offline.
 
-Semua art masih digambar prosedural (mengikuti prototype desain). Kalau nanti
-mau upgrade ke sprite PNG/SVG, cukup ganti isi fungsi `_draw()` — logika game
-tidak perlu disentuh. Semua tuning gameplay (kecepatan jatuh, interval spawn,
-peluang item jahat, hitbox) mengikuti spec di design handoff.
+Semua ukuran/warna/timing mengikuti design tokens di handoff persis
+(fall 2.6s, hit window ±0.22s, miss grace 0.25s, dst) — bisa diubah di
+3 konstanta atas `game.js`: `TEMPO`, `FALL_SECONDS`, `SHOW_KEYS`.
+
+## Menambah game baru
+
+1. Buat folder `games/<nama_game>/` dengan `index.html` sendiri (boleh
+   pola sama: HTML + CSS + JS terpisah, atau single-file seperti prototype).
+2. Tambahkan satu entri ke array `GAMES` di `script.js` (root): `emoji`,
+   `name`, `tag`, dan `url: 'games/<nama_game>/index.html'`. Kartu di home
+   screen dan alur loading → "Main Sekarang" otomatis mengarah ke situ.
+3. Di dalam game, sediakan tombol "kembali" yang mengarah ke
+   `../../index.html` (lihat `#homeBtn` di Konser Kelinci sebagai contoh).
 
 ## Test
 
-Smoke test headless (simulasi tangkap 8 scoop → bonus YUMMY, 3 bom → game over,
-cek save):
-
-```
-godot --headless --path . -s res://tests/smoke.gd
-```
-
-## Menambah game baru (rencana platform)
-
-1. Buat folder `games/<nama_game>/` dengan `main.tscn` sendiri.
-2. Buat scene hub (grid tombol pilihan game) dan jadikan main scene di
-   `project.godot`; tiap tombol memanggil
-   `get_tree().change_scene_to_file("res://games/<nama_game>/main.tscn")`.
-3. Beri tombol "kembali ke menu" di tiap game.
-
-## Export ke Android
-
-Project sudah diset portrait + stretch `canvas_items`/`keep` + renderer
-`gl_compatibility`, jadi siap untuk device low-end. Tinggal pasang export
-template Android di Godot (Editor → Manage Export Templates) lalu buat preset
-Android di Project → Export.
+Sudah diverifikasi otomatis dengan Playwright (headless Chromium):
+klik tombol lagu, gem jatuh & bisa di-hit tepat waktu, skor/combo naik,
+efek burst & popup muncul, lagu selesai otomatis → layar akhir dengan
+rating bintang benar, tombol "Main Lagi" kembali ke pilih lagu, dan
+navigasi hub ↔ game via tombol home berfungsi dua arah.

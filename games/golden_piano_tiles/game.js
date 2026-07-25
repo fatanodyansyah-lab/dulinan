@@ -44,11 +44,13 @@ const SPEEDS = {
   slow: {
     id: 'slow',
     label: 'Lambat',
-    rate: 0.7,
-    approach: 2.8,
-    bpm: 72,
-    hitWin: 0.32,
-    late: 0.28,
+    // Preschool preset: long visual lead-in, sparse notes, and about
+    // one real-time second of tolerance on either side of the hit line.
+    rate: 0.55,
+    approach: 4.0,
+    bpm: 50,
+    hitWin: 0.60,
+    late: 0.55,
   },
   normal: {
     id: 'normal',
@@ -221,14 +223,14 @@ function pickLane(prev) {
 }
 
 function patternsForSpeed() {
-  // Slower modes use fewer half-beats so the chart feels calmer
+  // The slow chart is intentionally sparse and has no half-beats, so
+  // children aged 3-4 only need to react to one clear tile at a time.
   if (speedId === 'slow') {
     return [
-      [{ d: 1 }, { d: 1 }, { d: 1 }, { d: 1 }],
-      [{ d: 1 }, { d: 1 }, { d: 2, hold: true }],
-      [{ d: 2 }, { d: 1 }, { d: 1 }],
-      [{ d: 1 }, { d: 0.5 }, { d: 0.5 }, { d: 2, hold: true }],
-      [{ d: 1 }, { d: 1 }, { d: 1 }, { d: 2, hold: true }],
+      [{ d: 1.25 }, { d: 1.25 }, { d: 1.5 }],
+      [{ d: 1.5 }, { d: 1.25 }, { d: 1.25 }],
+      [{ d: 1.25 }, { d: 1.5 }, { d: 1.25 }],
+      [{ d: 1.5 }, { d: 1.25, hold: true }, { d: 1.5 }],
     ];
   }
   if (speedId === 'normal') {

@@ -105,7 +105,9 @@ Kontrol: ketuk 3 zona layar (pointer), atau A/S/D (1/2/3) di keyboard.
 Space/Enter memulai ulang dari menu / game over. Di menu ada opsi
 kecepatan **Lambat / Normal / Cepat** (default Lambat; tersimpan di
 `localStorage` `goldenTilesSpeed`) — mengatur playbackRate lagu, waktu
-jatuh ubin, kepadatan beatmap, dan hit window.
+jatuh ubin, kepadatan beatmap, dan hit window. Mode Lambat dirancang
+untuk anak usia 3–4 tahun: ubin jauh lebih jarang, waktu jatuh lebih
+panjang, tanpa pola setengah-beat, dan waktu ketuk lebih longgar.
 
 ## Menambah game baru
 

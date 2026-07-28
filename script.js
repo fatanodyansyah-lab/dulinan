@@ -14,6 +14,7 @@
     { emoji: '🐰', name: 'Konser Kelinci', tag: 'Musik', url: 'games/konser_kelinci/index.html' },
     { emoji: '🎤', name: 'K-Pop Hunter Fashion', tag: 'Dress-Up', url: 'games/kpop_hunter_fashion/index.html' },
     { emoji: '🎹', name: 'Golden Piano Tiles', tag: 'Musik', url: 'games/golden_piano_tiles/index.html' },
+    { emoji: '🪐', name: 'Puzzle Planet', tag: 'Puzzle', url: 'games/puzzle_planet/index.html' },
   ];
 
   const homeScreen = document.getElementById('home-screen');

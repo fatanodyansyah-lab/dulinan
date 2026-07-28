@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Puzzle Planet 🪐</title>
+<meta name="description" content="Sliding puzzle luar angkasa untuk anak-anak — Dulinan Space">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div class="stars-bg" aria-hidden="true"></div>
+  <div class="sparkle sparkle-1" aria-hidden="true"></div>
+  <div class="sparkle sparkle-2" aria-hidden="true"></div>
+  <div class="sparkle sparkle-3" aria-hidden="true"></div>
+
+  <a id="homeBtn" href="../../index.html" aria-label="Kembali ke menu utama">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" fill="currentColor"/>
+    </svg>
+  </a>
+
+  <button type="button" id="muteBtn" class="icon-btn" aria-label="Mute audio">🔊</button>
+
+  <!-- MENU -->
+  <section id="screen-menu" class="screen">
+    <header class="menu-header">
+      <div class="menu-badge">DULINAN SPACE</div>
+      <h1 class="menu-title">Puzzle Planet <span aria-hidden="true">🪐</span></h1>
+      <p class="menu-sub">Susun planet yang pecah jadi utuh lagi!</p>
+    </header>
+
+    <div class="progress-card">
+      <div class="progress-row">
+        <span>Level terbuka</span>
+        <strong id="menu-unlocked">1</strong>
+      </div>
+      <div class="progress-row">
+        <span>Bintang terkumpul</span>
+        <strong id="menu-stars">☆☆☆</strong>
+      </div>
+    </div>
+
+    <div class="mode-row">
+      <button type="button" id="btn-levels" class="btn-primary">Main Level 🚀</button>
+      <button type="button" id="btn-chill" class="btn-ghost">Mode Santai ✨</button>
+    </div>
+
+    <div id="level-list" class="level-list" aria-label="Pilih level"></div>
+
+    <div id="chill-panel" class="chill-panel" hidden>
+      <p class="chill-label">Pilih gambar planet</p>
+      <div id="image-carousel" class="image-carousel" role="listbox" aria-label="Gambar puzzle"></div>
+      <button type="button" id="btn-start-chill" class="btn-primary btn-wide">Mulai Santai (3×3)</button>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="screen-play" class="screen" hidden>
+    <header class="play-header">
+      <div class="hud-chip">
+        <span class="hud-label">Gerakan</span>
+        <strong id="hud-moves">0</strong>
+      </div>
+      <div class="hud-chip hud-chip-mid">
+        <span class="hud-label" id="hud-mode-label">Level 1</span>
+        <strong id="hud-stars">☆☆☆</strong>
+      </div>
+      <div class="hud-chip">
+        <span class="hud-label">Terbaik</span>
+        <strong id="hud-best">—</strong>
+      </div>
+    </header>
+
+    <div class="board-wrap">
+      <div id="board" class="board" role="grid" aria-label="Papan puzzle"></div>
+      <div id="preview-flash" class="preview-flash" hidden aria-hidden="true"></div>
+    </div>
+
+    <div class="play-actions">
+      <button type="button" id="btn-shuffle" class="btn-action">🔀 Acak ulang</button>
+      <button type="button" id="btn-preview" class="btn-action">👁 Lihat contoh <span id="preview-left">(2)</span></button>
+      <button type="button" id="btn-menu" class="btn-action btn-action-soft">☰ Menu</button>
+    </div>
+
+    <p id="tutorial-hint" class="tutorial-hint" hidden>
+      Ketuk ubin di samping lubang bintang ⭐ untuk menggeser!
+    </p>
+  </section>
+
+  <!-- WIN -->
+  <div id="win-overlay" class="overlay" hidden>
+    <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+    <div class="win-card">
+      <div class="win-emoji" aria-hidden="true">✨🪐✨</div>
+      <h2 class="win-title">Hebat! Planet utuh ✨</h2>
+      <p id="win-stars" class="win-stars">⭐⭐⭐</p>
+      <p id="win-detail" class="win-detail">Selesai dalam 0 gerakan</p>
+      <div class="win-actions">
+        <button type="button" id="btn-replay" class="btn-ghost">Main Lagi</button>
+        <button type="button" id="btn-next" class="btn-primary">Level Berikutnya</button>
+      </div>
+      <button type="button" id="btn-win-menu" class="btn-link">Kembali ke menu</button>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

@@ -83,20 +83,23 @@ untuk edit ulang lalu "Kembali ke Panggung". "Main Lagi" reset semua outfit.
 
 ## Game: Telepon Huntrix (`games/telepon_huntrix/`)
 
-Game edukasi angka bertema panggilan video. Anak memilih Rumi, Mira, atau
-Zoey, lalu menyelesaikan lima soal mencocokkan angka 1–9 melalui keypad besar.
+Game edukasi angka bertema panggilan video. Sebelum mulai, anak memilih suara
+angka dalam Bahasa Indonesia atau English. Anak lalu memilih Rumi, Mira, atau
+Zoey dan menyelesaikan lima soal mencocokkan angka 1–9 melalui keypad besar.
+Setiap angka baru dilafalkan sesuai bahasa pilihan dan bisa didengarkan ulang.
 Jawaban benar memberi bunyi dan kemajuan bintang; jawaban keliru memberi
 petunjuk ramah tanpa mengurangi kesempatan bermain. Setelah semua angka cocok,
 layar menampilkan animasi menghubungi dan memutar video karakter yang dipilih.
 
 Struktur:
 
-- `index.html` — empat layar: pilih kontak, cocokkan angka, menghubungi, dan
-  panggilan video.
+- `index.html` — lima layar: pilih bahasa, pilih kontak, cocokkan angka,
+  menghubungi, dan panggilan video.
 - `style.css` — UI telepon warna-warni yang mobile-first, responsif terhadap
   layar pendek, safe area iOS, dan preferensi reduced motion.
-- `game.js` — state machine permainan, urutan angka acak, umpan balik suara
-  Web Audio, getaran opsional, pemutar video, dan kontrol keyboard 1–9.
+- `game.js` — state machine permainan, urutan angka acak, pelafalan angka
+  Indonesia/English melalui Speech Synthesis, umpan balik Web Audio, getaran
+  opsional, pemutar video, dan kontrol keyboard 1–9.
 - `assets/` — foto dan video Rumi, Mira, dan Zoey serta font Baloo 2 lokal.
 
 Kontrol: ketuk gambar teman, lalu ketuk angka yang sama dengan angka besar di

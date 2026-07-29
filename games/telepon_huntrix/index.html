@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#6f3be8">
   <title>Telepon Huntrix · Dulinan Space</title>
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <div id="app" class="app">
@@ -42,11 +42,54 @@
     </header>
 
     <main class="game-frame">
-      <section id="screen-contacts" class="screen contacts-screen" aria-labelledby="contacts-title">
+      <section id="screen-language" class="screen language-screen" aria-labelledby="language-title">
+        <div class="language-content">
+          <span class="eyebrow eyebrow-pink">PILIH BAHASA SUARA</span>
+          <div class="language-orb" aria-hidden="true">
+            <span class="language-orb-number">1</span>
+            <span class="language-orb-number">2</span>
+            <span class="language-orb-number">3</span>
+            <span class="language-sound-wave">)))</span>
+          </div>
+          <h1 id="language-title">Mau belajar<br>dengan bahasa apa?</h1>
+          <p>Pilih bahasa untuk suara angka sebelum mulai bermain.</p>
+
+          <div class="language-options" role="group" aria-label="Pilihan bahasa suara angka">
+            <button class="language-option language-option-id" type="button" data-language="id">
+              <span class="language-flag" aria-hidden="true">🇮🇩</span>
+              <span>
+                <strong>Bahasa Indonesia</strong>
+                <small>Satu · dua · tiga</small>
+              </span>
+              <span class="language-play" aria-hidden="true">▶</span>
+            </button>
+            <button class="language-option language-option-en" type="button" data-language="en">
+              <span class="language-flag" aria-hidden="true">🇬🇧</span>
+              <span>
+                <strong>English</strong>
+                <small>One · two · three</small>
+              </span>
+              <span class="language-play" aria-hidden="true">▶</span>
+            </button>
+          </div>
+
+          <p class="language-hint">
+            <span aria-hidden="true">🔊</span>
+            Angka akan disebutkan saat muncul
+          </p>
+        </div>
+      </section>
+
+      <section id="screen-contacts" class="screen contacts-screen" aria-labelledby="contacts-title" hidden>
         <div class="contacts-hero">
           <span class="eyebrow eyebrow-pink">PILIH TEMANMU</span>
           <h1 id="contacts-title">Mau telepon siapa?</h1>
           <p>Pilih satu teman, lalu cocokkan angkanya!</p>
+          <button id="change-language" class="language-change" type="button" aria-label="Ganti bahasa suara angka">
+            <span aria-hidden="true">🌐</span>
+            Suara: <strong id="language-label">Bahasa Indonesia</strong>
+            <span class="language-change-action">Ganti</span>
+          </button>
         </div>
 
         <div class="contact-grid" role="group" aria-label="Daftar teman yang bisa ditelepon">
@@ -153,6 +196,13 @@
             <span id="target-digit">5</span>
             <span class="orb-star orb-star-right" aria-hidden="true">✦</span>
           </div>
+
+          <button id="repeat-number" class="repeat-number" type="button" aria-label="Dengarkan angka lagi">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9v6h4l5 4V5L8 9H4Zm12.2-.8a5.4 5.4 0 0 1 0 7.6l1.4 1.4a7.4 7.4 0 0 0 0-10.4l-1.4 1.4Z" fill="currentColor"/>
+            </svg>
+            <span>Dengarkan lagi</span>
+          </button>
 
           <p id="feedback" class="feedback" aria-live="polite">
             Temukan angka <strong>5</strong> di bawah
@@ -271,6 +321,6 @@
     </main>
   </div>
 
-  <script src="game.js"></script>
+  <script src="game.js?v=2"></script>
 </body>
 </html>

@@ -27,20 +27,35 @@
 
   const ROUND_COUNT = 5;
   const CONNECTING_DELAY_MS = 2700;
+  const LANGUAGES = {
+    id: {
+      label: "Bahasa Indonesia",
+      locale: "id-ID",
+      numbers: ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan"]
+    },
+    en: {
+      label: "English",
+      locale: "en-US",
+      numbers: ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    }
+  };
   const app = document.getElementById("app");
   const gameFrame = document.querySelector(".game-frame");
   const screens = [...document.querySelectorAll(".screen")];
+  const languageButtons = [...document.querySelectorAll("[data-language]")];
   const contactButtons = [...document.querySelectorAll(".contact-card")];
   const keypadButtons = [...document.querySelectorAll("#keypad button")];
 
   const soundButton = document.getElementById("sound-button");
-  const screenDial = document.getElementById("screen-dial");
+  const changeLanguageButton = document.getElementById("change-language");
+  const languageLabel = document.getElementById("language-label");
   const backToContacts = document.getElementById("back-to-contacts");
   const dialAvatar = document.getElementById("dial-avatar");
   const dialName = document.getElementById("dial-name");
   const roundCounter = document.getElementById("round-counter");
   const targetOrb = document.getElementById("target-orb");
   const targetDigit = document.getElementById("target-digit");
+  const repeatNumber = document.getElementById("repeat-number");
   const feedback = document.getElementById("feedback");
   const progressDots = document.getElementById("progress-dots");
 
@@ -61,6 +76,7 @@
   const hangUpButton = document.getElementById("hang-up-button");
   const replayButton = document.getElementById("replay-button");
 
+  let selectedLanguage = null;
   let selectedKey = null;
   let sequence = [];
   let currentRound = 0;
@@ -70,7 +86,8 @@
   let connectingTimeout = 0;
   let ringingInterval = 0;
   let audioContext = null;
-  let activeScreenId = "screen-contacts";
+  let activeUtterance = null;
+  let activeScreenId = "screen-language";
 
   function blockAccidentalZoom() {
     const stopMultiTouch = (event) => {
@@ -143,6 +160,80 @@
     element.style.objectPosition = character.imagePosition;
   }
 
+  function getSelectedLanguage() {
+    return LANGUAGES[selectedLanguage] || LANGUAGES.id;
+  }
+
+  function cancelSpeech() {
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    activeUtterance = null;
+  }
+
+  function speakText(text) {
+    if (
+      !soundEnabled
+      || !selectedLanguage
+      || !("speechSynthesis" in window)
+      || typeof window.SpeechSynthesisUtterance !== "function"
+    ) {
+      return false;
+    }
+
+    const language = getSelectedLanguage();
+    const utterance = new window.SpeechSynthesisUtterance(text);
+    utterance.lang = language.locale;
+    utterance.rate = selectedLanguage === "id" ? .82 : .78;
+    utterance.pitch = 1.08;
+    utterance.volume = 1;
+
+    const voices = window.speechSynthesis.getVoices();
+    const locale = language.locale.toLowerCase();
+    const languagePrefix = locale.split("-")[0];
+    utterance.voice = voices.find((voice) => voice.lang.toLowerCase() === locale)
+      || voices.find((voice) => voice.lang.toLowerCase().startsWith(`${languagePrefix}-`))
+      || null;
+    utterance.addEventListener("end", () => {
+      if (activeUtterance === utterance) activeUtterance = null;
+    });
+    utterance.addEventListener("error", () => {
+      if (activeUtterance === utterance) activeUtterance = null;
+    });
+
+    cancelSpeech();
+    activeUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
+    return true;
+  }
+
+  function speakDigit(digit) {
+    const word = getSelectedLanguage().numbers[digit];
+    if (word) speakText(word);
+  }
+
+  function selectLanguage(key) {
+    const language = LANGUAGES[key];
+    if (!language) return;
+
+    selectedLanguage = key;
+    document.documentElement.lang = key;
+    languageLabel.textContent = language.label;
+    ensureAudioContext();
+    playTone("select");
+    speakText(language.numbers.slice(1, 4).join(", "));
+    showScreen("screen-contacts");
+  }
+
+  function returnToLanguagePicker() {
+    stopCall();
+    inputLocked = false;
+    currentRound = 0;
+    sequence = [];
+    selectedKey = null;
+    selectedLanguage = null;
+    document.documentElement.lang = "id";
+    showScreen("screen-language");
+  }
+
   function selectCharacter(key) {
     const character = CHARACTERS[key];
     if (!character) return;
@@ -165,15 +256,29 @@
     callVideo.poster = character.image;
     callVideo.load();
 
-    renderChallenge();
+    renderChallenge(false);
     showScreen("screen-dial");
     playTone("select");
+    speakDigit(sequence[currentRound]);
   }
 
-  function renderChallenge() {
+  function renderChallenge(announceDigit = true) {
     const digit = sequence[currentRound];
+    const language = getSelectedLanguage();
+    const spokenNumber = language.numbers[digit];
     targetDigit.textContent = String(digit);
-    targetOrb.setAttribute("aria-label", `Angka yang harus dicari: ${digit}`);
+    targetOrb.setAttribute(
+      "aria-label",
+      selectedLanguage === "en"
+        ? `Number to find: ${spokenNumber}`
+        : `Angka yang harus dicari: ${spokenNumber}`
+    );
+    repeatNumber.setAttribute(
+      "aria-label",
+      selectedLanguage === "en"
+        ? `Hear ${spokenNumber} again`
+        : `Dengarkan ${spokenNumber} lagi`
+    );
     roundCounter.textContent = `${currentRound + 1} / ${ROUND_COUNT}`;
     roundCounter.setAttribute("aria-label", `Soal ${currentRound + 1} dari ${ROUND_COUNT}`);
     feedback.className = "feedback";
@@ -207,6 +312,8 @@
       button.disabled = false;
       button.classList.remove("is-correct", "is-wrong");
     });
+
+    if (announceDigit) speakDigit(digit);
   }
 
   function handleDigit(button) {
@@ -244,6 +351,9 @@
     feedback.className = "feedback is-wrong";
     feedback.textContent = `Hampir! Cari angka ${wantedDigit} ya`;
     playTone("wrong");
+    window.setTimeout(() => {
+      if (!inputLocked && activeScreenId === "screen-dial") speakDigit(wantedDigit);
+    }, 260);
     vibrate([45, 35, 45]);
 
     window.setTimeout(() => {
@@ -329,6 +439,7 @@
     window.clearTimeout(challengeTimeout);
     challengeTimeout = 0;
     stopConnecting();
+    cancelSpeech();
     callVideo.pause();
     callVideo.removeAttribute("src");
     callVideo.removeAttribute("poster");
@@ -357,6 +468,11 @@
     if (enabled) {
       ensureAudioContext();
       playTone("select");
+      if (activeScreenId === "screen-dial" && sequence[currentRound]) {
+        speakDigit(sequence[currentRound]);
+      }
+    } else {
+      cancelSpeech();
     }
   }
 
@@ -426,6 +542,10 @@
     if ("vibrate" in navigator) navigator.vibrate(pattern);
   }
 
+  languageButtons.forEach((button) => {
+    button.addEventListener("click", () => selectLanguage(button.dataset.language));
+  });
+
   contactButtons.forEach((button) => {
     button.addEventListener("click", () => selectCharacter(button.dataset.character));
   });
@@ -434,6 +554,14 @@
     button.addEventListener("click", () => handleDigit(button));
   });
 
+  changeLanguageButton.addEventListener("click", returnToLanguagePicker);
+  repeatNumber.addEventListener("click", () => {
+    if (!soundEnabled) {
+      setSoundEnabled(true);
+      return;
+    }
+    speakDigit(sequence[currentRound]);
+  });
   backToContacts.addEventListener("click", returnToContacts);
   cancelCall.addEventListener("click", returnToContacts);
   hangUpButton.addEventListener("click", returnToContacts);
@@ -485,6 +613,7 @@
   });
 
   document.addEventListener("visibilitychange", () => {
+    if (document.hidden) cancelSpeech();
     if (document.hidden && activeScreenId === "screen-call" && !callVideo.paused) {
       callVideo.pause();
       answerPrompt.hidden = false;
@@ -493,6 +622,6 @@
   });
 
   blockAccidentalZoom();
-  showScreen("screen-contacts");
+  showScreen("screen-language");
   updateVideoSoundButton();
 })();

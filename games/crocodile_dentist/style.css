@@ -773,7 +773,7 @@ a:focus-visible {
 }
 
 .crocodile.is-celebrating {
-  animation: happyBounce .65s ease 2;
+  animation: happyBounce .65s ease;
 }
 
 .crocodile.is-celebrating .pupil {

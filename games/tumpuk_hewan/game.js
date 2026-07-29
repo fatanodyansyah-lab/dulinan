@@ -141,7 +141,7 @@
       angularVelocity: 0,
       invMass: 0,
       invInertia: 0,
-      restitution: 0.02,
+      restitution: 0,
       friction: 0.82,
       isStatic: true
     };
@@ -283,8 +283,8 @@
       invMass: 1 / mass,
       inertia,
       invInertia: 1 / inertia,
-      restitution: .035,
-      friction: .68,
+      restitution: 0,
+      friction: .76,
       isStatic: false,
       touching: false,
       hasLanded: false,
@@ -669,6 +669,22 @@
     };
     applyImpulse(bodyA, frictionImpulse, radiusA, -1);
     applyImpulse(bodyB, frictionImpulse, radiusB, 1);
+
+    // Benturan vertikal dibuat "empuk": energi jatuh diserap supaya hewan
+    // tidak memantul, tetapi komponen horizontal tetap cukup untuk bergeser.
+    if (normalSpeed < -45 && Math.abs(collision.normal.y) > .45) {
+      const upperBody = collision.normal.y < 0 ? bodyB : bodyA;
+      const lowerBody = upperBody === bodyB ? bodyA : bodyB;
+      if (!upperBody.isStatic) {
+        upperBody.vy = upperBody.vy < 0 ? Math.max(upperBody.vy, -4) : upperBody.vy * .28;
+        upperBody.vx *= .88;
+        upperBody.angularVelocity *= .58;
+      }
+      if (!lowerBody.isStatic) {
+        lowerBody.vy *= .5;
+        lowerBody.angularVelocity *= .82;
+      }
+    }
   }
 
   function simulate(step) {
@@ -676,6 +692,7 @@
     for (const body of state.bodies) {
       body.touching = false;
       body.vy += gravity * step;
+      body.vy = Math.min(body.vy, 720);
       body.vx *= Math.pow(.9985, step * 60);
       body.angularVelocity *= Math.pow(.997, step * 60);
       body.x += body.vx * step;

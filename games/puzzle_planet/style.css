@@ -178,16 +178,6 @@ button {
   font-size: 16px;
 }
 
-.mode-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.mode-row .btn-primary,
-.mode-row .btn-ghost {
-  flex: 1;
-}
-
 .btn-primary {
   background: linear-gradient(135deg, #ffd166, #ffa62b);
   color: #4a2800;
@@ -205,6 +195,23 @@ button {
   opacity: .5;
   pointer-events: none;
 }
+.btn-hero {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 20px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  animation: hero-pulse 2s ease-in-out infinite;
+}
+.btn-hero-sub {
+  font-size: 13px;
+  font-weight: 700;
+  opacity: .85;
+}
 .btn-ghost {
   background: rgba(255,255,255,.08);
   color: #fff;
@@ -219,7 +226,16 @@ button {
   transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(0,0,0,.25);
 }
-.btn-wide { width: 100%; margin-top: 12px; }
+.btn-chill-toggle {
+  width: 100%;
+  margin-top: 10px;
+  flex-shrink: 0;
+  font-size: 14px;
+  border-color: rgba(255,255,255,.22);
+  box-shadow: none;
+  background: rgba(255,255,255,.06);
+}
+.btn-wide { width: 100%; margin-top: 4px; }
 .btn-link {
   background: none;
   color: rgba(255,255,255,.7);
@@ -228,6 +244,23 @@ button {
   text-decoration: underline;
   margin-top: 8px;
   padding: 8px;
+  width: 100%;
+}
+
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.menu-section[hidden] { display: none !important; }
+.section-label {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffd34d;
+  letter-spacing: .02em;
 }
 
 .level-list {
@@ -237,7 +270,7 @@ button {
   overflow-y: auto;
   flex: 1;
   min-height: 0;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   -webkit-overflow-scrolling: touch;
 }
 .level-card {
@@ -249,21 +282,33 @@ button {
   text-align: center;
   color: #fff;
   box-shadow: 0 6px 14px rgba(0,0,0,.25);
-  min-height: 120px;
+  min-height: 110px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
 }
-.level-card:active:not(:disabled) { transform: scale(.97); }
-.level-card.is-locked {
-  opacity: .55;
-  filter: grayscale(.4);
+.level-card:not(:disabled) {
+  border-color: rgba(167,139,255,.45);
 }
 .level-card.is-current {
   border-color: #ffd34d;
-  box-shadow: 0 0 0 2px rgba(255,211,77,.35), 0 6px 14px rgba(0,0,0,.25);
+  box-shadow: 0 0 0 2px rgba(255,211,77,.4), 0 6px 14px rgba(0,0,0,.25);
+}
+.level-card:active:not(:disabled) { transform: scale(.97); }
+.level-cta {
+  font-size: 11px;
+  font-weight: 800;
+  color: #1a0a40;
+  background: #ffd34d;
+  border-radius: 999px;
+  padding: 2px 10px;
+  margin-top: 2px;
+}
+.level-card.is-locked {
+  opacity: .55;
+  filter: grayscale(.4);
 }
 .level-thumb {
   width: 56px;
@@ -291,6 +336,10 @@ button {
 
 .chill-panel {
   margin-top: 4px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   background: rgba(26, 11, 51, .5);
   border: 2px solid rgba(255,143,177,.3);
   border-radius: 18px;
@@ -301,7 +350,14 @@ button {
   margin: 0 0 10px;
   text-align: center;
   font-size: 14px;
+  font-weight: 700;
+  color: #ffd34d;
+}
+.chill-label-2 {
+  margin-top: 8px;
+  margin-bottom: 6px;
   color: rgba(255,255,255,.8);
+  font-weight: 600;
 }
 .image-carousel {
   display: flex;
@@ -396,11 +452,19 @@ button {
   background-size: cover;
   background-repeat: no-repeat;
   transition: transform 180ms cubic-bezier(.25,.8,.25,1), left 180ms cubic-bezier(.25,.8,.25,1), top 180ms cubic-bezier(.25,.8,.25,1);
-  will-change: left, top;
-  cursor: pointer;
+  will-change: left, top, transform;
+  cursor: grab;
   -webkit-user-drag: none;
+  touch-action: none;
 }
-.tile:active { filter: brightness(1.08); }
+.tile:active { cursor: grabbing; filter: brightness(1.08); }
+.tile.is-dragging {
+  z-index: 8;
+  transition: none;
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,.45);
+  cursor: grabbing;
+}
 .tile.is-blank {
   background: transparent;
   border: none;
@@ -584,6 +648,10 @@ button {
 @keyframes cfall {
   0% { transform: translateY(-40px) rotate(0deg); opacity: 1; }
   100% { transform: translateY(110vh) rotate(720deg); opacity: .85; }
+}
+@keyframes hero-pulse {
+  0%, 100% { box-shadow: 0 6px 0 #c47a12, 0 8px 18px rgba(255, 166, 43, .35); }
+  50% { box-shadow: 0 6px 0 #c47a12, 0 8px 28px rgba(255, 211, 77, .65); }
 }
 
 /* short landscape / small height tweaks */

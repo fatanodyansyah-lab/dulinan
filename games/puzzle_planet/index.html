@@ -41,17 +41,25 @@
       </div>
     </div>
 
-    <div class="mode-row">
-      <button type="button" id="btn-levels" class="btn-primary">Main Level 🚀</button>
-      <button type="button" id="btn-chill" class="btn-ghost">Mode Santai ✨</button>
+    <!-- Satu tombol utama biar jelas mau diklik apa -->
+    <button type="button" id="btn-play-now" class="btn-primary btn-hero">
+      🚀 Main Sekarang
+      <span class="btn-hero-sub" id="btn-play-now-sub">Level 1</span>
+    </button>
+
+    <div class="menu-section" id="section-levels">
+      <p class="section-label">Atau pilih level di bawah ↓</p>
+      <div id="level-list" class="level-list" aria-label="Pilih level"></div>
     </div>
 
-    <div id="level-list" class="level-list" aria-label="Pilih level"></div>
+    <button type="button" id="btn-chill" class="btn-ghost btn-chill-toggle">✨ Mode Santai (bebas main)</button>
 
     <div id="chill-panel" class="chill-panel" hidden>
-      <p class="chill-label">Pilih gambar planet</p>
+      <p class="chill-label">1. Pilih gambar planet</p>
       <div id="image-carousel" class="image-carousel" role="listbox" aria-label="Gambar puzzle"></div>
-      <button type="button" id="btn-start-chill" class="btn-primary btn-wide">Mulai Santai (3×3)</button>
+      <p class="chill-label chill-label-2">2. Lalu tekan tombol ini</p>
+      <button type="button" id="btn-start-chill" class="btn-primary btn-wide">Mulai Mode Santai (3×3)</button>
+      <button type="button" id="btn-back-levels" class="btn-link">← Kembali ke daftar level</button>
     </div>
   </section>
 
@@ -84,7 +92,7 @@
     </div>
 
     <p id="tutorial-hint" class="tutorial-hint" hidden>
-      Ketuk ubin di samping lubang bintang ⭐ untuk menggeser!
+      Ketuk atau <strong>geser</strong> ubin di samping lubang bintang ⭐!
     </p>
   </section>
 

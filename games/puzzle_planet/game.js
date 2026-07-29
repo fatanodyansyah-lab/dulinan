@@ -668,9 +668,20 @@
     return t;
   }
 
+  function nextPlayLevel() {
+    // Continue from highest unlocked, or replay last if all open
+    return Math.min(state.unlocked, TOTAL_LEVELS);
+  }
+
   function renderMenu() {
     elMenuUnlocked.textContent = String(state.unlocked);
     elMenuStars.textContent = `${totalStarsEarned()} / ${TOTAL_LEVELS * 3} ⭐`;
+
+    const playLv = nextPlayLevel();
+    const playSub = $('btn-play-now-sub');
+    if (playSub) {
+      playSub.textContent = `Level ${playLv} · ${playLv <= 4 ? '3×3' : '4×4'}`;
+    }
 
     elLevelList.innerHTML = '';
     for (let lv = 1; lv <= TOTAL_LEVELS; lv++) {
@@ -678,19 +689,20 @@
       const size = lv <= 4 ? 3 : 4;
       const theme = THEMES[(lv - 1) % THEMES.length];
       const stars = state.stars[lv] || 0;
+      const isCurrent = lv === playLv && !locked;
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'level-card' + (locked ? ' is-locked' : '') + (lv === Math.min(state.unlocked, TOTAL_LEVELS) && !locked ? ' is-current' : '');
+      btn.className = 'level-card' + (locked ? ' is-locked' : '') + (isCurrent ? ' is-current' : '');
       btn.disabled = locked;
-      btn.setAttribute('aria-label', locked ? `Level ${lv} terkunci` : `Level ${lv}, ${theme.name}`);
+      btn.setAttribute('aria-label', locked ? `Level ${lv} terkunci` : `Main level ${lv}, ${theme.name}`);
 
-      // thumb from cache or placeholder
       const thumbUrl = buildThemeImage((lv - 1) % THEMES.length);
 
       btn.innerHTML = `
         <div class="level-thumb" style="background-image:url('${thumbUrl}')"></div>
         <div class="level-num">Level ${lv} · ${size}×${size}</div>
         <div class="level-stars">${locked ? '🔒' : emptyStarString(stars)}</div>
+        ${!locked ? `<div class="level-cta">${isCurrent ? 'MAIN' : 'Pilih'}</div>` : ''}
       `;
       if (!locked) {
         btn.addEventListener('click', () => startLevel(lv));
@@ -722,11 +734,12 @@
 
   function setChillVisible(on) {
     elChill.hidden = !on;
-    elLevelList.hidden = !!on;
-    $('btn-levels').classList.toggle('btn-primary', !on);
-    $('btn-levels').classList.toggle('btn-ghost', on);
-    $('btn-chill').classList.toggle('btn-primary', on);
-    $('btn-chill').classList.toggle('btn-ghost', !on);
+    const sectionLevels = $('section-levels');
+    const btnPlayNow = $('btn-play-now');
+    const btnChill = $('btn-chill');
+    if (sectionLevels) sectionLevels.hidden = !!on;
+    if (btnPlayNow) btnPlayNow.hidden = !!on;
+    if (btnChill) btnChill.hidden = !!on;
   }
 
   async function startLevel(level) {
@@ -802,16 +815,24 @@
     $('btn-preview').disabled = state.previewLeft <= 0 || state.solved;
   }
 
-  function renderBoard(withAnim) {
+  function boardMetrics() {
     const size = state.size;
     const gap = 4;
     const boardW = elBoard.clientWidth || Math.min(window.innerWidth - 32, 360);
     const cell = (boardW - gap * (size + 1)) / size;
-    const blankVal = blankValue(size);
+    return { size, gap, boardW, cell };
+  }
 
-    // Position map: value -> board index
-    const posOf = new Array(size * size);
+  function valuePositionMap() {
+    const posOf = new Array(state.size * state.size);
     state.tiles.forEach((val, idx) => { posOf[val] = idx; });
+    return posOf;
+  }
+
+  function renderBoard(withAnim) {
+    const { size, gap, cell } = boardMetrics();
+    const blankVal = blankValue(size);
+    const posOf = valuePositionMap();
 
     if (!elBoard.dataset.built || elBoard.dataset.size !== String(size)) {
       elBoard.innerHTML = '';
@@ -822,7 +843,8 @@
         tile.type = 'button';
         tile.className = 'tile';
         tile.dataset.value = String(v);
-        tile.addEventListener('click', () => onTileTap(v));
+        // Pointer handlers for tap + drag/slide
+        tile.addEventListener('pointerdown', onTilePointerDown);
         elBoard.appendChild(tile);
       }
     }
@@ -830,6 +852,7 @@
     const children = elBoard.children;
     for (let v = 0; v < size * size; v++) {
       const tile = children[v];
+      if (tile.classList.contains('is-dragging')) continue;
       const idx = posOf[v];
       const { r, c } = indexToRC(idx, size);
       const left = gap + c * (cell + gap);
@@ -838,6 +861,7 @@
       tile.style.height = cell + 'px';
       tile.style.left = left + 'px';
       tile.style.top = top + 'px';
+      tile.style.transform = '';
       tile.dataset.index = String(idx);
 
       if (v === blankVal) {
@@ -859,19 +883,158 @@
     }
   }
 
-  function onTileTap(value) {
-    if (state.animating || state.solved) return;
-    const blankVal = blankValue(state.size);
-    if (value === blankVal) return;
+  // ---------- pointer drag / swipe ----------
+  const drag = {
+    active: false,
+    value: -1,
+    startX: 0,
+    startY: 0,
+    dx: 0,
+    dy: 0,
+    moved: false,
+    pointerId: null,
+    canSlide: false,
+    dirX: 0, // unit toward blank: -1,0,1
+    dirY: 0,
+    maxDrag: 0,
+    el: null
+  };
 
-    const posOf = new Array(state.size * state.size);
-    state.tiles.forEach((val, idx) => { posOf[val] = idx; });
+  function resetDragVisual() {
+    if (drag.el) {
+      drag.el.classList.remove('is-dragging');
+      drag.el.style.transform = '';
+      try { drag.el.releasePointerCapture(drag.pointerId); } catch (e) { /* ignore */ }
+    }
+    drag.active = false;
+    drag.value = -1;
+    drag.el = null;
+    drag.pointerId = null;
+    drag.moved = false;
+    drag.canSlide = false;
+  }
+
+  function onTilePointerDown(e) {
+    if (state.animating || state.solved) return;
+    if (e.button != null && e.button !== 0) return;
+
+    const tile = e.currentTarget;
+    const value = parseInt(tile.dataset.value, 10);
+    const blankVal = blankValue(state.size);
+    if (value === blankVal || tile.classList.contains('is-blank')) return;
+
+    const posOf = valuePositionMap();
     const tileIdx = posOf[value];
     const blankIdx = state.blank;
+    const adj = neighbors(blankIdx, state.size).includes(tileIdx);
 
-    if (!neighbors(blankIdx, state.size).includes(tileIdx)) return;
+    const { r: tr, c: tc } = indexToRC(tileIdx, state.size);
+    const { r: br, c: bc } = indexToRC(blankIdx, state.size);
 
-    // swap
+    drag.active = true;
+    drag.value = value;
+    drag.startX = e.clientX;
+    drag.startY = e.clientY;
+    drag.dx = 0;
+    drag.dy = 0;
+    drag.moved = false;
+    drag.pointerId = e.pointerId;
+    drag.el = tile;
+    drag.canSlide = adj;
+    drag.dirX = adj ? (bc - tc) : 0;
+    drag.dirY = adj ? (br - tr) : 0;
+    drag.maxDrag = boardMetrics().cell + boardMetrics().gap;
+
+    tile.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!drag.active || e.pointerId !== drag.pointerId) return;
+    drag.dx = e.clientX - drag.startX;
+    drag.dy = e.clientY - drag.startY;
+    if (Math.abs(drag.dx) > 6 || Math.abs(drag.dy) > 6) drag.moved = true;
+
+    if (!drag.canSlide || !drag.el) return;
+
+    // Project movement onto axis toward blank only
+    let along = drag.dx * drag.dirX + drag.dy * drag.dirY;
+    along = Math.max(0, Math.min(drag.maxDrag, along));
+    const tx = along * drag.dirX;
+    const ty = along * drag.dirY;
+    drag.el.classList.add('is-dragging');
+    drag.el.style.transform = `translate(${tx}px, ${ty}px)`;
+  }
+
+  function onPointerUp(e) {
+    if (!drag.active || (drag.pointerId != null && e.pointerId !== drag.pointerId)) return;
+
+    const value = drag.value;
+    const wasMoved = drag.moved;
+    const canSlide = drag.canSlide;
+    const dx = drag.dx;
+    const dy = drag.dy;
+    const along = dx * drag.dirX + dy * drag.dirY;
+    const threshold = drag.maxDrag * 0.28;
+    const el = drag.el;
+
+    resetDragVisual();
+    if (el) el.style.transform = '';
+
+    if (value < 0) return;
+
+    // Drag far enough toward blank → commit move
+    if (canSlide && wasMoved && along >= threshold) {
+      tryMoveValue(value);
+      return;
+    }
+
+    // Pure tap (little movement) on tile adjacent to blank → move
+    if (!wasMoved && canSlide) {
+      tryMoveValue(value);
+      return;
+    }
+
+    // Swipe: move the tile that sits on the opposite side of the blank
+    // (finger right → tile left of blank slides into the hole)
+    if (wasMoved) {
+      trySwipeDirection(dx, dy);
+    }
+  }
+
+  function trySwipeDirection(dx, dy) {
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    if (absX < 18 && absY < 18) return false;
+
+    const blankIdx = state.blank;
+    const { r: br, c: bc } = indexToRC(blankIdx, state.size);
+    let tr = br;
+    let tc = bc;
+    if (absX > absY) {
+      // horizontal: finger right → tile on left of blank
+      tc = dx > 0 ? bc - 1 : bc + 1;
+    } else {
+      // vertical: finger down → tile above blank
+      tr = dy > 0 ? br - 1 : br + 1;
+    }
+    if (tr < 0 || tr >= state.size || tc < 0 || tc >= state.size) return false;
+    const tileIdx = rcToIndex(tr, tc, state.size);
+    const value = state.tiles[tileIdx];
+    return tryMoveValue(value);
+  }
+
+  function tryMoveValue(value) {
+    if (state.animating || state.solved) return false;
+    const blankVal = blankValue(state.size);
+    if (value === blankVal || value == null) return false;
+
+    const posOf = valuePositionMap();
+    const tileIdx = posOf[value];
+    if (tileIdx == null) return false;
+    const blankIdx = state.blank;
+    if (!neighbors(blankIdx, state.size).includes(tileIdx)) return false;
+
     state.tiles[blankIdx] = value;
     state.tiles[tileIdx] = blankVal;
     state.blank = tileIdx;
@@ -886,8 +1049,8 @@
       if (isSolved(state.tiles)) onWin();
     }, SLIDE_MS + 10);
 
-    // hide tutorial after first move
     if (!elTutorial.hidden) elTutorial.hidden = true;
+    return true;
   }
 
   function onWin() {
@@ -971,18 +1134,23 @@
   }
 
   // ---------- events ----------
-  $('btn-levels').addEventListener('click', () => {
-    setChillVisible(false);
+  $('btn-play-now').addEventListener('click', () => {
     sfxPop();
+    startLevel(nextPlayLevel());
   });
   $('btn-chill').addEventListener('click', () => {
     setChillVisible(true);
+    sfxPop();
+  });
+  $('btn-back-levels').addEventListener('click', () => {
+    setChillVisible(false);
     sfxPop();
   });
   $('btn-start-chill').addEventListener('click', () => startChill());
   $('btn-shuffle').addEventListener('click', doShuffle);
   $('btn-preview').addEventListener('click', doPreview);
   $('btn-menu').addEventListener('click', () => {
+    setChillVisible(false);
     showScreen('menu');
     renderMenu();
   });
@@ -1001,6 +1169,7 @@
   });
   $('btn-win-menu').addEventListener('click', () => {
     elWin.hidden = true;
+    setChillVisible(false);
     showScreen('menu');
     renderMenu();
   });
@@ -1010,6 +1179,11 @@
     save();
     if (!state.mute) sfxPop();
   });
+
+  // Global pointer listeners for drag/slide
+  window.addEventListener('pointermove', onPointerMove, { passive: false });
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerUp);
 
   window.addEventListener('resize', () => {
     if (!elPlay.hidden) renderBoard(false);

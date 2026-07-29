@@ -1,15 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Dulinan Space</title>
 <meta name="description" content="Dulinan Space — kumpulan permainan seru untuk anak-anak. Ayo pilih permainanmu!">
-<link rel="icon" href="data:,">
+<meta name="theme-color" content="#5b46d6">
+<meta name="application-name" content="Dulinan Space">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Dulinan Space">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/branding/favicon-64.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/branding/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -24,18 +32,17 @@
   <!-- HOME SCREEN -->
   <main class="home-screen" id="home-screen">
     <header class="home-header">
-      <div class="mascot" aria-hidden="true">
-        <div class="mascot-face"></div>
-        <div class="mascot-eye mascot-eye-left"></div>
-        <div class="mascot-eye mascot-eye-right"></div>
-        <div class="mascot-pupil mascot-pupil-left"></div>
-        <div class="mascot-pupil mascot-pupil-right"></div>
-        <div class="mascot-mouth"></div>
-      </div>
-      <div class="title-block">
-        <h1 class="app-title">Dulinan Space</h1>
-        <p class="subtitle">Ayo pilih permainanmu! 🚀</p>
-      </div>
+      <h1 class="brand-heading">
+        <img
+          class="brand-logo"
+          src="assets/branding/dulinan-space-logo.png"
+          width="768"
+          height="512"
+          alt="Dulinan Space"
+          fetchpriority="high"
+        >
+      </h1>
+      <p class="subtitle">Ayo pilih permainanmu! 🚀</p>
     </header>
 
     <section class="games-grid" id="games-grid" aria-label="Daftar permainan">

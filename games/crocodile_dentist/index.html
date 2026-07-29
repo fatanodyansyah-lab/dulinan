@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#73c957">
+  <meta name="description" content="Crocodile Dentist — pilih gigi aman dan jangan sampai digigit buaya!">
+  <title>Crocodile Dentist 🐊</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+    <div class="sky-glow" aria-hidden="true"></div>
+    <div class="cloud cloud-left" aria-hidden="true"></div>
+    <div class="cloud cloud-right" aria-hidden="true"></div>
+    <div class="jungle jungle-left" aria-hidden="true"></div>
+    <div class="jungle jungle-right" aria-hidden="true"></div>
+    <div class="water-ripple ripple-one" aria-hidden="true"></div>
+    <div class="water-ripple ripple-two" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="round-button home-button" href="../../index.html" aria-label="Kembali ke menu utama">
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true">
+          <path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" fill="currentColor"/>
+        </svg>
+      </a>
+
+      <div class="scoreboard" role="group" aria-label="Papan skor">
+        <div class="score-item">
+          <span>SKOR</span>
+          <strong id="scoreValue">0</strong>
+        </div>
+        <div class="score-divider" aria-hidden="true"></div>
+        <div class="score-item score-best">
+          <span>TERBAIK</span>
+          <strong id="bestValue">0</strong>
+        </div>
+      </div>
+
+      <button class="round-button sound-button" id="soundButton" type="button" aria-label="Matikan suara" aria-pressed="false">
+        <span aria-hidden="true">🔊</span>
+      </button>
+    </header>
+
+    <p class="status-pill" id="statusText">Tekan Mulai untuk bermain!</p>
+
+    <section class="game-stage" aria-label="Mulut buaya">
+      <div class="crocodile" id="crocodile">
+        <div class="head-back" aria-hidden="true"></div>
+        <div class="side-bump side-bump-left" aria-hidden="true"></div>
+        <div class="side-bump side-bump-right" aria-hidden="true"></div>
+
+        <div class="mouth-cavity" aria-hidden="true">
+          <div class="mouth-shine"></div>
+          <div class="tongue"></div>
+        </div>
+
+        <div class="upper-jaw">
+          <div class="snout" aria-hidden="true">
+            <div class="snout-highlight"></div>
+            <div class="nostril nostril-left"></div>
+            <div class="nostril nostril-right"></div>
+            <div class="snout-dot dot-one"></div>
+            <div class="snout-dot dot-two"></div>
+            <div class="snout-dot dot-three"></div>
+            <div class="snout-dot dot-four"></div>
+          </div>
+
+          <div class="eyes" aria-hidden="true">
+            <div class="eye eye-left">
+              <div class="eyebrow"></div>
+              <div class="pupil"><div class="eye-glint"></div></div>
+            </div>
+            <div class="eye eye-right">
+              <div class="eyebrow"></div>
+              <div class="pupil"><div class="eye-glint"></div></div>
+            </div>
+          </div>
+
+          <div class="gum gum-upper" aria-hidden="true"></div>
+          <div class="teeth-row teeth-upper" id="upperTeeth" role="group" aria-label="Gigi atas"></div>
+        </div>
+
+        <div class="lower-jaw">
+          <div class="lower-lip" aria-hidden="true">
+            <div class="chin-highlight"></div>
+          </div>
+          <div class="gum gum-lower" aria-hidden="true"></div>
+          <div class="teeth-row teeth-lower" id="lowerTeeth" role="group" aria-label="Gigi bawah"></div>
+        </div>
+
+        <div class="bite-stars" aria-hidden="true">
+          <span>✦</span>
+          <span>★</span>
+          <span>✦</span>
+        </div>
+      </div>
+
+      <div class="score-pop-layer" id="scorePopLayer" aria-hidden="true"></div>
+    </section>
+
+    <div class="screen-overlay" id="introOverlay">
+      <section class="modal-card intro-card" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+        <div class="modal-mascot" aria-hidden="true">🐊</div>
+        <p class="eyebrow-label">DULINAN SPACE</p>
+        <h1 id="introTitle">Crocodile Dentist</h1>
+        <p class="intro-copy">Ada <strong>1 gigi jebakan</strong> yang membuat buaya menggigit!</p>
+        <div class="how-to-play">
+          <div><span aria-hidden="true">👆</span><p>Tekan gigi atas atau bawah.</p></div>
+          <div><span aria-hidden="true">⭐</span><p>Gigi aman memberi <strong>+1 skor</strong>.</p></div>
+          <div><span aria-hidden="true">🐊</span><p>Hindari gigi jebakan!</p></div>
+        </div>
+        <button class="primary-button" id="startButton" type="button">Mulai Main</button>
+      </section>
+    </div>
+
+    <div class="screen-overlay" id="resultOverlay" hidden>
+      <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+      <section class="modal-card result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+        <div class="result-icon" id="resultIcon" aria-hidden="true">😵</div>
+        <h2 id="resultTitle">Aduh, digigit!</h2>
+        <p class="result-copy" id="resultCopy">Kamu menemukan gigi jebakan.</p>
+        <div class="final-score">
+          <span>SKORMU</span>
+          <strong id="finalScore">0</strong>
+        </div>
+        <p class="best-note" id="bestNote">Skor terbaik: 0</p>
+        <button class="primary-button" id="replayButton" type="button">Main Lagi</button>
+        <a class="menu-link" href="../../index.html">Kembali ke menu</a>
+      </section>
+    </div>
+
+    <p class="sr-only" id="liveRegion" aria-live="assertive"></p>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

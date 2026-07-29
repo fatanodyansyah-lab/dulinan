@@ -35,6 +35,7 @@
     { bg: 'linear-gradient(135deg,#ffd166,#ffa62b)', shadow: 'rgba(255,166,43,.4)', playColor: '#f59300' },
     { bg: 'linear-gradient(135deg,#a78bff,#7a5cff)', shadow: 'rgba(122,92,255,.4)', playColor: '#7a5cff' },
     { bg: 'linear-gradient(135deg,#5dd6b0,#22b98a)', shadow: 'rgba(34,185,138,.4)', playColor: '#22b98a' },
+    { bg: 'linear-gradient(135deg,#70cf7a,#278c45)', shadow: 'rgba(39,140,69,.4)', playColor: '#278c45' },
   ];
 
   // Each real game lives in games/<folder>/index.html — add a new entry here
@@ -45,6 +46,7 @@
     { emoji: '🎤', name: 'K-Pop Hunter Fashion', tag: 'Dress-Up', url: 'games/kpop_hunter_fashion/index.html' },
     { emoji: '🎹', name: 'Golden Piano Tiles', tag: 'Musik', url: 'games/golden_piano_tiles/index.html' },
     { emoji: '🪐', name: 'Puzzle Planet', tag: 'Puzzle', url: 'games/puzzle_planet/index.html' },
+    { emoji: '🐊', name: 'Crocodile Dentist', tag: 'Tebak Gigi', url: 'games/crocodile_dentist/index.html' },
   ];
 
   const homeScreen = document.getElementById('home-screen');

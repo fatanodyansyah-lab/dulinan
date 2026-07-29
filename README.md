@@ -109,6 +109,18 @@ jatuh ubin, kepadatan beatmap, dan hit window. Mode Lambat dirancang
 untuk anak usia 3–4 tahun: ubin jauh lebih jarang, waktu jatuh lebih
 panjang, tanpa pola setengah-beat, dan waktu ketuk lebih longgar.
 
+## Game: Crocodile Dentist (`games/crocodile_dentist/`)
+
+Game keberuntungan sederhana untuk anak: tekan gigi buaya pada rahang atas
+atau bawah. Setiap gigi aman masuk ke gusi dan memberi 1 skor, sedangkan satu
+gigi jebakan yang dipilih acak akan membuat rahang buaya menutup dan mengakhiri
+ronde. Menekan seluruh gigi aman menghasilkan kemenangan dengan skor penuh.
+
+Ilustrasi buaya, hutan, gigi, serta animasi gigitan dibuat sepenuhnya dengan
+HTML/CSS. `game.js` mengatur gigi jebakan acak, state ronde, skor terbaik di
+`localStorage`, Web Audio, getaran perangkat, akses keyboard, dan mode tanpa
+animasi bagi pengguna yang mengaktifkan `prefers-reduced-motion`.
+
 ## Menambah game baru
 
 1. Buat folder `games/<nama_game>/` dengan `index.html` sendiri (boleh

@@ -41,7 +41,7 @@
       url: 'games/kucing_es_krim/index.html',
     },
     {
-      name: 'Konser Kelinci',
+      name: 'Gitar Kelinci',
       tag: 'Musik',
       tagIcon: '♫',
       theme: 'theme-blue',

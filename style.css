@@ -76,34 +76,43 @@ button {
 
 .home-header {
   flex: 0 0 auto;
-  padding: max(10px, env(safe-area-inset-top)) 20px 4px;
+  padding: max(50px, calc(env(safe-area-inset-top) + 18px)) 24px 12px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.brand-heading {
-  margin: 0;
-  line-height: 0;
+  gap: 12px;
 }
 
 .brand-logo {
   display: block;
-  width: auto;
-  height: clamp(140px, 24dvh, 205px);
-  max-width: min(84vw, 340px);
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
   object-fit: contain;
-  filter: drop-shadow(0 10px 15px rgba(43,45,110,.16));
+  border-radius: 18px;
+  filter: drop-shadow(0 6px 10px rgba(43,45,110,.2));
   animation: brand-float 4s ease-in-out infinite;
 }
 
+.title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-title {
+  margin: 0;
+  font-family: 'Baloo 2', cursive;
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1;
+  color: #3a2a6d;
+  letter-spacing: -.5px;
+}
+
 .subtitle {
-  margin: -7px 0 4px;
+  margin: 3px 0 0;
   font-size: 14px;
   color: #c06a3e;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* ---------- games grid ---------- */

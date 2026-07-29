@@ -109,6 +109,27 @@ jatuh ubin, kepadatan beatmap, dan hit window. Mode Lambat dirancang
 untuk anak usia 3–4 tahun: ubin jauh lebih jarang, waktu jatuh lebih
 panjang, tanpa pola setengah-beat, dan waktu ketuk lebih longgar.
 
+## Game: Tumpuk Hewan (`games/tumpuk_hewan/`)
+
+Game keseimbangan endless: geser hewan yang menunggu ke kiri/kanan,
+tekan **JATUHKAN!**, lalu susun sebanyak mungkin di atas platform rumput.
+Sembilan hewan mempunyai ukuran dan massa berbeda. Fisika rigid-body
+ringan menangani gravitasi, rotasi, gesekan, tumbukan, dan efek tumpukan
+yang ikut bergeser ketika tersenggol. Permainan berakhir saat salah satu
+hewan jatuh keluar platform.
+
+Struktur:
+
+- `index.html` — HUD, tutorial singkat, kontrol jatuhkan, serta layar hasil.
+- `style.css` — tampilan portrait mobile-first, panel kaca, animasi, dan
+  dukungan safe-area perangkat.
+- `game.js` — loop fisika fixed-step, collision SAT untuk kotak berotasi,
+  ilustrasi hewan/platform prosedural, partikel, getar, dan Web Audio.
+
+Kontrol: drag di area permainan atau panah kiri/kanan untuk memilih posisi;
+tekan tombol **JATUHKAN!**, Space, atau Enter untuk melepas hewan. Rekor dan
+pilihan suara tersimpan di `localStorage`.
+
 ## Menambah game baru
 
 1. Buat folder `games/<nama_game>/` dengan `index.html` sendiri (boleh

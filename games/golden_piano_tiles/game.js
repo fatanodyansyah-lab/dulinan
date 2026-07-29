@@ -36,7 +36,8 @@
 })();
 
 // ---------- speed presets ----------
-// rate: song playbackRate (slower song = more time to react)
+// The song always plays at normal speed/pitch (playbackRate stays 1) —
+// only the tile fall speed, note density and hit windows change per mode.
 // approach: seconds for a tile head to fall to the hit line
 // bpm: beatmap note density (lower = fewer notes)
 // hitWin / late: slightly looser windows on slower modes
@@ -46,25 +47,22 @@ const SPEEDS = {
     label: 'Lambat',
     // Preschool preset: long visual lead-in, sparse notes, and about
     // one real-time second of tolerance on either side of the hit line.
-    rate: 0.55,
-    approach: 4.0,
-    bpm: 50,
-    hitWin: 0.60,
-    late: 0.55,
+    approach: 7.3,
+    bpm: 28,
+    hitWin: 1.1,
+    late: 1.0,
   },
   normal: {
     id: 'normal',
     label: 'Normal',
-    rate: 0.85,
-    approach: 2.3,
-    bpm: 88,
-    hitWin: 0.28,
-    late: 0.24,
+    approach: 2.7,
+    bpm: 75,
+    hitWin: 0.33,
+    late: 0.28,
   },
   fast: {
     id: 'fast',
     label: 'Cepat',
-    rate: 1.0,
     approach: 2.0,
     bpm: 100,
     hitWin: 0.24,
@@ -367,7 +365,7 @@ function startGame() {
 
   song.currentTime = 0;
   song.volume = 1;
-  song.playbackRate = speed.rate;
+  song.playbackRate = 1;
   try { song.preservesPitch = true; } catch (_) {}
   song.onended = () => {
     if (phase === 'playing') endGame('win');

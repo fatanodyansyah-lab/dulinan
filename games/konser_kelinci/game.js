@@ -4,8 +4,8 @@
   const FALL_SECONDS = 1.85;
   const HIT_WINDOW = 0.27;
   const SONG_SECONDS = 30;
-  const LANE_POSITIONS = [12.5, 37.5, 62.5, 87.5];
-  const LANE_COLORS = ["#ff4f6f", "#ffc928", "#94df37", "#35b9ff"];
+  const LANE_POSITIONS = [100 / 6, 50, 500 / 6];
+  const LANE_COLORS = ["#ff4f6f", "#ffc928", "#94df37"];
   const KEY_MAP = {
     a: 0,
     arrowleft: 0,
@@ -13,8 +13,6 @@
     arrowdown: 1,
     d: 2,
     arrowup: 2,
-    f: 3,
-    arrowright: 3,
   };
   const FEEDBACK = {
     perfect: ["Sempurna!", "Hebat!", "Mantap!"],
@@ -23,7 +21,7 @@
   };
 
   function buildChart() {
-    const lanes = [0, 1, 2, 3, 2, 1, 0, 2, 1, 3, 2, 0, 1, 2, 3, 1];
+    const lanes = [0, 1, 2, 1, 0, 2, 1, 2, 0, 1, 2, 0];
     const chart = [];
     let time = 1.45;
     let index = 0;
@@ -115,7 +113,7 @@
   function playPluck(lane, quality) {
     if (!audioContext) return;
     const now = audioContext.currentTime;
-    const frequencies = [261.63, 329.63, 392, 523.25];
+    const frequencies = [261.63, 329.63, 392];
     const gain = audioContext.createGain();
     const oscillator = audioContext.createOscillator();
 

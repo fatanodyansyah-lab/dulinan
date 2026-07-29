@@ -12,11 +12,10 @@
   --yellow-dark: #b26d00;
   --green: #94df37;
   --green-dark: #358b22;
-  --blue: #35b9ff;
-  --blue-dark: #1754b6;
   --ink: #17144f;
   --panel: rgba(30, 25, 104, 0.88);
   --panel-border: #e58dcf;
+  --playfield-width: min(72vw, 540px);
 }
 
 * {
@@ -69,8 +68,10 @@ button {
 
 .scene {
   z-index: -3;
-  background: url("assets/gitar-kelinci-bg.webp") center top / cover no-repeat;
-  transform: scale(1.015);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .scene-shade {
@@ -331,7 +332,7 @@ button {
   left: 50%;
   bottom: calc(clamp(82px, 18vw, 116px) + env(safe-area-inset-bottom));
   z-index: 5;
-  width: min(86vw, 560px);
+  width: var(--playfield-width);
   height: min(58dvh, 585px);
   perspective: 760px;
   perspective-origin: 50% 0;
@@ -344,12 +345,13 @@ button {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-right: 3px solid rgba(80, 211, 255, 0.82);
-  border-left: 3px solid rgba(255, 94, 191, 0.82);
-  border-radius: 25px 25px 4px 4px;
+  border-radius: 18px 18px 4px 4px;
   background: linear-gradient(180deg, rgba(26, 24, 74, 0.05), rgba(24, 24, 78, 0.72) 34%, rgba(16, 16, 61, 0.94));
-  box-shadow: -9px 0 20px rgba(255, 73, 183, 0.18), 9px 0 20px rgba(38, 180, 255, 0.18);
-  clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+  box-shadow:
+    inset 3px 0 rgba(255, 94, 191, 0.82),
+    inset -3px 0 rgba(80, 211, 255, 0.82),
+    -9px 0 20px rgba(255, 73, 183, 0.18),
+    9px 0 20px rgba(38, 180, 255, 0.18);
 }
 
 .lane-tint,
@@ -361,23 +363,21 @@ button {
 }
 
 .lane-tint {
-  width: 25%;
+  width: calc(100% / 3);
   opacity: 0.11;
 }
 
 .lane-0 { left: 0; background: linear-gradient(180deg, transparent, var(--red)); }
-.lane-1 { left: 25%; background: linear-gradient(180deg, transparent, var(--yellow)); }
-.lane-2 { left: 50%; background: linear-gradient(180deg, transparent, var(--green)); }
-.lane-3 { left: 75%; background: linear-gradient(180deg, transparent, var(--blue)); }
+.lane-1 { left: calc(100% / 3); background: linear-gradient(180deg, transparent, var(--yellow)); }
+.lane-2 { left: calc(200% / 3); background: linear-gradient(180deg, transparent, var(--green)); }
 
 .lane-line {
   width: 2px;
   background: linear-gradient(180deg, transparent, rgba(214, 209, 255, 0.46));
 }
 
-.line-1 { left: 25%; }
-.line-2 { left: 50%; }
-.line-3 { left: 75%; }
+.line-1 { left: calc(100% / 3); }
+.line-2 { left: calc(200% / 3); }
 
 #hitLine {
   position: absolute;
@@ -386,7 +386,7 @@ button {
   left: 1%;
   height: 5px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--red), var(--yellow), var(--green), var(--blue));
+  background: linear-gradient(90deg, var(--red), var(--yellow), var(--green));
   box-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
   animation: hit-line-glow 1s ease-in-out infinite alternate;
 }
@@ -410,10 +410,9 @@ button {
   transform: rotate(12deg);
 }
 
-.receptor-0 { left: 12.5%; color: var(--red); background: var(--red-dark); }
-.receptor-1 { left: 37.5%; color: var(--yellow); background: var(--yellow-dark); }
-.receptor-2 { left: 62.5%; color: var(--green); background: var(--green-dark); }
-.receptor-3 { left: 87.5%; color: var(--blue); background: var(--blue-dark); }
+.receptor-0 { left: calc(100% / 6); color: var(--red); background: var(--red-dark); }
+.receptor-1 { left: 50%; color: var(--yellow); background: var(--yellow-dark); }
+.receptor-2 { left: calc(500% / 6); color: var(--green); background: var(--green-dark); }
 
 .note {
   --note-size: clamp(42px, 12vw, 62px);
@@ -443,7 +442,6 @@ button {
 .note-0 { color: var(--red); background: radial-gradient(circle at 45% 30%, #ffb2c1, var(--red) 45%, var(--red-dark)); }
 .note-1 { color: var(--yellow); background: radial-gradient(circle at 45% 30%, #fff2a3, var(--yellow) 45%, var(--yellow-dark)); }
 .note-2 { color: var(--green); background: radial-gradient(circle at 45% 30%, #d6ff9b, var(--green) 45%, var(--green-dark)); }
-.note-3 { color: var(--blue); background: radial-gradient(circle at 45% 30%, #a7e9ff, var(--blue) 45%, var(--blue-dark)); }
 
 .burst {
   position: absolute;
@@ -494,20 +492,21 @@ button {
 
 #buttonRow {
   position: absolute;
-  right: max(8px, calc((100vw - 590px) / 2));
+  left: 50%;
   bottom: max(8px, env(safe-area-inset-bottom));
-  left: max(8px, calc((100vw - 590px) / 2));
   z-index: 14;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(6px, 2vw, 14px);
+  grid-template-columns: repeat(3, 1fr);
+  width: var(--playfield-width);
+  transform: translateX(-50%);
 }
 
 .tap-button {
   position: relative;
   display: grid;
   place-items: center;
-  width: 100%;
+  justify-self: center;
+  width: calc(100% - clamp(8px, 2.6vw, 16px));
   max-height: 98px;
   aspect-ratio: 1.1;
   padding: 0;
@@ -547,7 +546,6 @@ button {
 .key-red { --key: var(--red); --key-dark: var(--red-dark); background: linear-gradient(145deg, #ff7a8f, var(--red)); }
 .key-yellow { --key: var(--yellow); --key-dark: var(--yellow-dark); background: linear-gradient(145deg, #ffe76c, #ffb500); }
 .key-green { --key: var(--green); --key-dark: var(--green-dark); background: linear-gradient(145deg, #b9f45c, #65c82b); }
-.key-blue { --key: var(--blue); --key-dark: var(--blue-dark); background: linear-gradient(145deg, #63d7ff, #238be9); }
 
 .overlay {
   position: absolute;
@@ -804,8 +802,8 @@ button {
 }
 
 @media (min-width: 740px) and (orientation: landscape) {
-  .scene {
-    background-position: center 26%;
+  :root {
+    --playfield-width: min(58vw, 620px);
   }
 
   .score-panel {
@@ -828,14 +826,11 @@ button {
 
   #highwayWrap {
     bottom: 102px;
-    width: min(58vw, 620px);
     height: min(68dvh, 540px);
   }
 
   #buttonRow {
-    right: 18%;
     bottom: 12px;
-    left: 18%;
   }
 
   .tap-button {

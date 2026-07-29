@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#15124d">
   <title>Gitar Kelinci</title>
-  <link rel="preload" href="assets/gitar-kelinci-bg.webp" as="image" type="image/webp">
   <link rel="preload" href="assets/selalu-ada-di-nadimu-30s.mp3" as="audio" type="audio/mpeg">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <main id="stage">
-    <div class="scene" aria-hidden="true"></div>
+    <video class="scene" autoplay muted loop playsinline preload="auto" poster="assets/gitar-kelinci-bg.webp" aria-hidden="true">
+      <source src="assets/background-video.mp4" type="video/mp4">
+    </video>
     <div class="scene-shade" aria-hidden="true"></div>
 
     <section class="score-panel hud-panel" aria-label="Skor permainan">
@@ -54,39 +55,33 @@
       <strong id="timeValue">0:30</strong>
     </aside>
 
-    <section id="highwayWrap" aria-label="Empat lajur not musik">
+    <section id="highwayWrap" aria-label="Tiga lajur not musik">
       <div id="highway">
         <div class="lane-tint lane-0"></div>
         <div class="lane-tint lane-1"></div>
         <div class="lane-tint lane-2"></div>
-        <div class="lane-tint lane-3"></div>
         <div class="lane-line line-1"></div>
         <div class="lane-line line-2"></div>
-        <div class="lane-line line-3"></div>
         <div id="notesLayer"></div>
         <div id="burstsLayer"></div>
         <div id="hitLine"></div>
         <div class="receptor receptor-0" aria-hidden="true"><span>♩</span></div>
         <div class="receptor receptor-1" aria-hidden="true"><span>♩</span></div>
         <div class="receptor receptor-2" aria-hidden="true"><span>♩</span></div>
-        <div class="receptor receptor-3" aria-hidden="true"><span>♩</span></div>
       </div>
     </section>
 
     <div id="feedback" aria-live="polite"></div>
 
     <div id="buttonRow" role="group" aria-label="Tombol gitar">
-      <button class="tap-button key-red" data-lane="0" type="button" aria-label="Lajur merah, tombol A">
+      <button class="tap-button key-red" data-lane="0" type="button" aria-label="Nada merah, tombol A">
         <span>A</span>
       </button>
-      <button class="tap-button key-yellow" data-lane="1" type="button" aria-label="Lajur kuning, tombol S">
+      <button class="tap-button key-yellow" data-lane="1" type="button" aria-label="Nada kuning, tombol S">
         <span>S</span>
       </button>
-      <button class="tap-button key-green" data-lane="2" type="button" aria-label="Lajur hijau, tombol D">
+      <button class="tap-button key-green" data-lane="2" type="button" aria-label="Nada hijau, tombol D">
         <span>D</span>
-      </button>
-      <button class="tap-button key-blue" data-lane="3" type="button" aria-label="Lajur biru, tombol F">
-        <span>F</span>
       </button>
     </div>
 
@@ -103,7 +98,7 @@
         <button id="startBtn" class="primary-button" type="button">
           Mulai Bermain <span aria-hidden="true">▶</span>
         </button>
-        <small class="keyboard-hint">Pakai jari atau tombol A · S · D · F</small>
+        <small class="keyboard-hint">Pakai jari atau tombol A · S · D</small>
         <a class="home-link" href="../../index.html">← Kembali ke Dulinan Space</a>
       </div>
     </section>
@@ -133,6 +128,6 @@
 
     <audio id="songAudio" src="assets/selalu-ada-di-nadimu-30s.mp3" preload="auto"></audio>
   </main>
-  <script src="game.js?v=3"></script>
+  <script src="game.js?v=4"></script>
 </body>
 </html>

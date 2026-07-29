@@ -1190,3 +1190,107 @@ a:focus-visible {
     transition-duration: .01ms !important;
   }
 }
+
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  #app {
+    width: 100%;
+    max-width: none;
+  }
+
+  .topbar {
+    width: min(100%, 760px);
+    margin: 0 auto;
+    grid-template-columns: 52px 1fr 52px;
+    padding: max(16px, env(safe-area-inset-top)) 24px 7px;
+  }
+
+  .round-button {
+    width: 50px;
+    height: 50px;
+  }
+
+  .scoreboard {
+    min-width: 230px;
+    min-height: 55px;
+  }
+
+  .status-pill {
+    min-width: 270px;
+    font-size: 16px;
+  }
+
+  .game-stage {
+    padding-top: 0;
+  }
+
+  .crocodile {
+    width: min(54vw, 525px, calc((100dvh - 132px) * .84));
+  }
+
+  .jungle {
+    width: 180px;
+  }
+
+  .cloud-left {
+    left: 7%;
+  }
+
+  .cloud-right {
+    right: 7%;
+  }
+
+  .intro-card {
+    width: min(100%, 760px);
+    display: grid;
+    grid-template-columns: minmax(210px, .78fr) minmax(320px, 1.22fr);
+    grid-template-rows: auto auto auto auto;
+    align-items: center;
+    column-gap: 34px;
+    padding: 28px 34px 26px;
+  }
+
+  .intro-card .modal-mascot {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .intro-card .eyebrow-label {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .intro-card h1 {
+    grid-column: 1;
+    grid-row: 3;
+    font-size: 42px;
+  }
+
+  .intro-card .intro-copy {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .intro-card .how-to-play {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    width: 100%;
+    margin: 0;
+    padding: 16px 18px;
+  }
+
+  .intro-card .how-to-play div {
+    min-height: 48px;
+  }
+
+  .intro-card .primary-button {
+    grid-column: 2;
+    grid-row: 4;
+    justify-self: center;
+  }
+
+  .result-card {
+    width: min(100%, 460px);
+  }
+}

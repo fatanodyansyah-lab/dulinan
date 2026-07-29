@@ -785,3 +785,116 @@ a:focus-visible {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  .game-shell {
+    width: min(100vw, 960px);
+    min-height: 0;
+  }
+
+  .top-bar {
+    top: max(16px, env(safe-area-inset-top));
+    right: 22px;
+    left: 22px;
+    grid-template-columns: 48px 1fr 48px;
+  }
+
+  .round-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .brand-chip {
+    height: 48px;
+    min-width: 210px;
+    font-size: 20px;
+  }
+
+  .hud {
+    top: max(78px, calc(env(safe-area-inset-top) + 64px));
+    right: auto;
+    left: 50%;
+    width: min(480px, calc(100% - 190px));
+    grid-template-columns: 1fr 98px 1fr;
+    transform: translateX(-50%);
+  }
+
+  .hud.is-hidden {
+    transform: translate(-50%, -8px);
+  }
+
+  .aim-hint {
+    top: max(146px, calc(env(safe-area-inset-top) + 134px));
+  }
+
+  .status-toast {
+    top: 158px;
+  }
+
+  .drop-button {
+    width: 280px;
+    min-height: 64px;
+  }
+
+  .overlay {
+    padding: max(28px, calc(env(safe-area-inset-top) + 18px)) 42px max(28px, env(safe-area-inset-bottom));
+  }
+
+  .intro-card {
+    width: min(100%, 760px);
+    display: grid;
+    grid-template-columns: minmax(230px, .8fr) minmax(360px, 1.2fr);
+    grid-template-rows: auto auto auto auto;
+    align-items: center;
+    column-gap: 34px;
+    padding: 28px 32px 26px;
+  }
+
+  .intro-card .eyebrow,
+  .intro-card .intro-animals,
+  .intro-card h1,
+  .intro-card .intro-copy {
+    grid-column: 1;
+  }
+
+  .intro-card .intro-animals {
+    height: 76px;
+    margin-top: 0;
+  }
+
+  .intro-card h1 {
+    font-size: 48px;
+  }
+
+  .intro-card .intro-copy {
+    margin-bottom: 0;
+  }
+
+  .intro-card .how-to {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    width: 100%;
+    margin: 0;
+    padding: 18px 12px;
+  }
+
+  .intro-card .primary-button {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .intro-card .intro-best {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  .game-over-card {
+    width: min(100%, 470px);
+  }
+
+  .rotate-notice {
+    display: none !important;
+  }
+}

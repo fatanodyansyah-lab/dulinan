@@ -267,3 +267,97 @@ html, body {
 @keyframes flameUp { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-78px) scale(.1); opacity: 0; } }
 @keyframes ringOut { 0% { transform: scale(.3); opacity: .95; } 100% { transform: scale(2.3); opacity: 0; } }
 @keyframes flashOut { 0% { opacity: .9; } 100% { opacity: 0; } }
+
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  .hudCard {
+    top: 18px;
+    left: 20px;
+    min-width: 105px;
+    padding: 7px 18px;
+  }
+
+  #comboCard {
+    right: 20px !important;
+  }
+
+  #homeBtn {
+    top: 18px;
+    width: 46px;
+    height: 46px;
+  }
+
+  #highwayWrap {
+    width: min(62vw, 640px);
+    height: calc(100dvh - 190px);
+    bottom: 116px;
+    perspective: 880px;
+  }
+
+  #buttonRow {
+    width: min(62vw, 640px);
+    bottom: max(18px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  }
+
+  .tapBtn {
+    width: 78px;
+    height: 78px;
+    font-size: 26px;
+  }
+
+  #feedback {
+    top: 34%;
+    font-size: 58px;
+  }
+
+  #startScreen {
+    display: grid;
+    grid-template-columns: minmax(280px, .9fr) minmax(330px, 1.1fr);
+    grid-template-rows: auto auto auto auto;
+    align-content: center;
+    column-gap: clamp(36px, 7vw, 88px);
+    row-gap: 14px;
+    padding: 44px max(56px, 8vw);
+  }
+
+  #startScreen .title {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    font-size: clamp(48px, 6vw, 68px);
+  }
+
+  #startScreen .instrCard {
+    grid-column: 1;
+    grid-row: 2 / span 2;
+    max-width: 390px;
+    justify-self: center;
+    font-size: 18px;
+    padding: 16px 20px;
+  }
+
+  #startScreen .pickLabel {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  #startScreen #songList {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  #startScreen .hint {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
+
+  #endScreen {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    column-gap: 28px;
+  }
+}

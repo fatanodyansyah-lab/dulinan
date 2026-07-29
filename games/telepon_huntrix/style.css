@@ -1354,6 +1354,233 @@ a:focus-visible {
   }
 }
 
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  .app {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+  }
+
+  .top-bar {
+    height: calc(76px + env(safe-area-inset-top));
+    grid-template-columns: 48px minmax(250px, 420px) 48px;
+    justify-content: center;
+    gap: 14px;
+    padding-right: max(22px, env(safe-area-inset-right));
+    padding-left: max(22px, env(safe-area-inset-left));
+  }
+
+  .icon-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .game-brand {
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .game-frame {
+    top: calc(76px + env(safe-area-inset-top));
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: max(18px, env(safe-area-inset-left));
+    border-radius: 38px;
+  }
+
+  .contacts-screen {
+    display: grid;
+    grid-template-columns: minmax(220px, .62fr) minmax(0, 1.38fr);
+    grid-template-rows: 1fr auto auto;
+    align-items: center;
+    column-gap: clamp(24px, 4vw, 64px);
+    padding: 24px max(28px, 4vw);
+  }
+
+  .contacts-hero {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    padding-bottom: 26px;
+  }
+
+  .contacts-hero h1 {
+    font-size: clamp(38px, 4.2vw, 54px);
+  }
+
+  .contacts-hero p {
+    max-width: 330px;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 18px;
+  }
+
+  .contact-grid {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    align-self: center;
+    margin: 0;
+    gap: clamp(14px, 2vw, 24px);
+  }
+
+  .contact-card {
+    padding: 12px 11px 16px;
+    border-radius: 28px;
+  }
+
+  .contact-card strong {
+    margin-top: 10px;
+    font-size: clamp(20px, 2.5vw, 28px);
+  }
+
+  .contact-number {
+    font-size: 12px;
+  }
+
+  .learning-card {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    max-width: 350px;
+    margin: 0 auto;
+    padding: 15px 16px;
+    font-size: 14px;
+  }
+
+  .tiny-stars {
+    grid-column: 1;
+    grid-row: 3;
+    margin-top: 18px;
+  }
+
+  .dial-screen {
+    display: grid;
+    grid-template-columns: minmax(260px, .82fr) minmax(320px, 1.18fr);
+    grid-template-rows: auto 1fr auto;
+    column-gap: clamp(24px, 4vw, 72px);
+    padding: 20px max(28px, 4vw) 24px;
+  }
+
+  .dial-header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .number-challenge {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    align-self: center;
+    margin: 0;
+  }
+
+  .target-orb {
+    width: clamp(132px, 21vh, 174px);
+    height: clamp(132px, 21vh, 174px);
+    font-size: clamp(78px, 13vh, 104px);
+  }
+
+  .feedback {
+    font-size: 16px;
+  }
+
+  .feedback strong {
+    font-size: 21px;
+  }
+
+  .keypad {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    width: min(100%, 470px);
+    margin: 0 auto;
+    gap: 12px;
+  }
+
+  .keypad button {
+    min-height: clamp(62px, 10vh, 82px);
+    border-radius: 24px;
+    font-size: clamp(32px, 5vw, 46px);
+  }
+
+  .keypad-tip {
+    grid-column: 2;
+    grid-row: 3;
+    margin: 12px 0 0;
+  }
+
+  .connecting-screen {
+    padding: 28px 56px;
+  }
+
+  .connecting-content {
+    display: grid;
+    grid-template-columns: auto minmax(260px, 1fr);
+    grid-template-rows: auto auto auto auto auto;
+    column-gap: 50px;
+    text-align: left;
+  }
+
+  .connecting-content > .eyebrow,
+  .connecting-content > h1,
+  .connecting-content > .connecting-number,
+  .connecting-content > .calling-dots,
+  .connecting-content > .connecting-cheer {
+    grid-column: 2;
+  }
+
+  .connecting-content > .eyebrow {
+    align-self: end;
+    justify-self: start;
+  }
+
+  .ring-avatar {
+    grid-column: 1;
+    grid-row: 1 / 6;
+    width: clamp(190px, 28vh, 230px);
+    height: clamp(190px, 28vh, 230px);
+    margin: 0;
+  }
+
+  .connecting-screen h1 {
+    font-size: clamp(34px, 4vw, 48px);
+  }
+
+  .calling-dots {
+    justify-content: flex-start;
+  }
+
+  .cancel-button {
+    min-width: 170px;
+    padding: 12px 26px;
+  }
+
+  .call-screen video {
+    object-fit: contain;
+  }
+
+  .call-header {
+    padding: 22px 26px;
+  }
+
+  .call-controls {
+    left: 50%;
+    width: min(520px, 58%);
+    padding: 24px 28px max(24px, calc(env(safe-area-inset-bottom) + 14px));
+    transform: translateX(-50%);
+  }
+
+  .answer-prompt button {
+    max-width: 360px;
+    padding: 18px 22px 18px 16px;
+  }
+
+  .call-ended {
+    width: min(48%, 380px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -693,3 +693,156 @@ button {
   .play-actions { margin-top: 8px; }
   .btn-action { padding: 9px 8px; font-size: 12px; }
 }
+
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  #app {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  #homeBtn {
+    top: max(16px, env(safe-area-inset-top));
+    left: max(20px, env(safe-area-inset-left));
+    width: 46px;
+    height: 46px;
+  }
+
+  #muteBtn {
+    top: max(16px, env(safe-area-inset-top));
+    right: max(20px, env(safe-area-inset-right));
+    width: 46px;
+    height: 46px;
+  }
+
+  .screen {
+    padding: max(24px, calc(env(safe-area-inset-top) + 16px)) max(34px, calc(env(safe-area-inset-right) + 24px)) max(24px, calc(env(safe-area-inset-bottom) + 16px));
+  }
+
+  #screen-menu {
+    display: grid;
+    grid-template-columns: minmax(230px, .72fr) minmax(0, 1.28fr);
+    grid-template-rows: auto auto auto 1fr;
+    align-content: center;
+    column-gap: clamp(28px, 4vw, 60px);
+    padding-right: max(32px, 4vw);
+    padding-left: max(32px, 4vw);
+  }
+
+  .menu-header {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    margin-bottom: 18px;
+  }
+
+  .menu-title {
+    font-size: clamp(36px, 4vw, 48px);
+  }
+
+  .menu-sub {
+    font-size: 17px;
+  }
+
+  .progress-card {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .btn-hero {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .menu-section,
+  .chill-panel {
+    grid-column: 2;
+    grid-row: 1 / 5;
+    align-self: stretch;
+    margin: 0;
+    padding-top: 4px;
+  }
+
+  .btn-chill-toggle {
+    grid-column: 1;
+    grid-row: 4;
+    align-self: start;
+  }
+
+  .level-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .level-card {
+    min-height: 128px;
+  }
+
+  .level-thumb {
+    width: 62px;
+    height: 62px;
+  }
+
+  .chill-panel {
+    justify-content: center;
+    padding: 22px;
+  }
+
+  .image-carousel {
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  #screen-play {
+    display: grid;
+    grid-template-columns: minmax(300px, 1fr) minmax(220px, 330px);
+    grid-template-rows: auto 1fr auto;
+    column-gap: clamp(28px, 4vw, 60px);
+    align-content: center;
+    padding-right: max(32px, 4vw);
+    padding-left: max(32px, 4vw);
+  }
+
+  .play-header {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0 0 16px;
+  }
+
+  .board-wrap {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    align-self: center;
+    width: min(100%, calc(100dvh - 64px), 620px);
+  }
+
+  .play-actions {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+  }
+
+  .play-actions .btn-action {
+    min-height: 58px;
+    white-space: normal;
+  }
+
+  .tutorial-hint {
+    grid-column: 2;
+    grid-row: 3;
+    align-self: start;
+    margin-top: 14px;
+  }
+
+  .win-card {
+    width: min(100%, 380px);
+    padding: 28px 24px 20px;
+  }
+}

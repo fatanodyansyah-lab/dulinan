@@ -45,6 +45,7 @@
     { emoji: '🐱', name: 'Kucing Es Krim', tag: 'Arcade', url: 'games/kucing_es_krim/index.html' },
     { emoji: '🐰', name: 'Konser Kelinci', tag: 'Musik', url: 'games/konser_kelinci/index.html' },
     { emoji: '🎤', name: 'K-Pop Hunter Fashion', tag: 'Dress-Up', url: 'games/kpop_hunter_fashion/index.html' },
+    { emoji: '📱', name: 'Telepon Huntrix', tag: 'Belajar Angka', url: 'games/telepon_huntrix/index.html' },
     { emoji: '🎹', name: 'Golden Piano Tiles', tag: 'Musik', url: 'games/golden_piano_tiles/index.html' },
     { emoji: '🪐', name: 'Puzzle Planet', tag: 'Puzzle', url: 'games/puzzle_planet/index.html' },
     { emoji: '🐾', name: 'Tumpuk Hewan', tag: 'Keseimbangan', url: 'games/tumpuk_hewan/index.html' },

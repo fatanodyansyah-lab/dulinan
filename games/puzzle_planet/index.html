@@ -86,12 +86,13 @@
     </div>
 
     <div class="play-actions">
+      <button type="button" id="btn-hint" class="btn-action btn-action-hint" aria-controls="board tutorial-hint">💡 Petunjuk</button>
       <button type="button" id="btn-shuffle" class="btn-action">🔀 Acak ulang</button>
       <button type="button" id="btn-preview" class="btn-action">👁 Lihat contoh <span id="preview-left">(2)</span></button>
       <button type="button" id="btn-menu" class="btn-action btn-action-soft">☰ Menu</button>
     </div>
 
-    <p id="tutorial-hint" class="tutorial-hint" hidden>
+    <p id="tutorial-hint" class="tutorial-hint" aria-live="polite" hidden>
       Ketuk atau <strong>geser</strong> ubin di samping lubang bintang ⭐!
     </p>
   </section>

@@ -67,6 +67,7 @@
     blank: 0,
     moves: 0,
     previewLeft: PREVIEW_MAX,
+    hintMoves: [],
     animating: false,
     solved: false,
     imageUrl: '',
@@ -92,6 +93,7 @@
   const elHudStars = $('hud-stars');
   const elHudBest = $('hud-best');
   const elHudMode = $('hud-mode-label');
+  const elBtnHint = $('btn-hint');
   const elPreviewLeft = $('preview-left');
   const elPreviewFlash = $('preview-flash');
   const elTutorial = $('tutorial-hint');
@@ -621,11 +623,32 @@
     return true;
   }
 
-  /** Always-solvable shuffle: random legal moves from solved, then verify parity. */
+  /**
+   * Verify that a sequence of tile values is a legal route from a board to
+   * the solved state. Kept small and pure so the hint route is easy to test.
+   */
+  function doesHintPathSolve(arr, size, hintMoves) {
+    const tiles = arr.slice();
+    const blankVal = blankValue(size);
+    let blank = tiles.indexOf(blankVal);
+
+    for (const value of hintMoves) {
+      const tileIdx = tiles.indexOf(value);
+      if (!neighbors(blank, size).includes(tileIdx)) return false;
+      tiles[blank] = value;
+      tiles[tileIdx] = blankVal;
+      blank = tileIdx;
+    }
+
+    return isSolved(tiles);
+  }
+
+  /** Always-solvable shuffle with a guaranteed route back to the solution. */
   function shuffleSolvable(size) {
     const n = size * size;
     const blankVal = blankValue(size);
     const tiles = Array.from({ length: n }, (_, i) => i);
+    const shuffleMoves = [];
     let blank = blankVal;
 
     // Enough random legal slides so it looks scrambled
@@ -634,8 +657,10 @@
     for (let s = 0; s < steps; s++) {
       const opts = neighbors(blank, size).filter((i) => i !== last);
       const pick = opts[Math.floor(Math.random() * opts.length)];
-      tiles[blank] = tiles[pick];
+      const movedValue = tiles[pick];
+      tiles[blank] = movedValue;
       tiles[pick] = blankVal;
+      shuffleMoves.push(movedValue);
       last = blank;
       blank = pick;
     }
@@ -644,24 +669,24 @@
     if (isSolved(tiles)) {
       const opts = neighbors(blank, size);
       const pick = opts[0];
-      tiles[blank] = tiles[pick];
+      const movedValue = tiles[pick];
+      tiles[blank] = movedValue;
       tiles[pick] = blankVal;
+      shuffleMoves.push(movedValue);
       blank = pick;
     }
 
-    // Parity safety net (should always pass after legal moves)
+    // Legal slides preserve parity. Restart defensively if that invariant breaks.
     if (!isSolvable(tiles, size)) {
-      // swap two non-blank tiles to flip parity if somehow broken
-      const a = tiles.findIndex((v) => v !== blankVal);
-      const b = tiles.findIndex((v, i) => i !== a && v !== blankVal);
-      if (a >= 0 && b >= 0) {
-        const t = tiles[a];
-        tiles[a] = tiles[b];
-        tiles[b] = t;
-      }
+      return shuffleSolvable(size);
     }
 
-    return { tiles, blank };
+    const solutionMoves = shuffleMoves.slice().reverse();
+    if (!doesHintPathSolve(tiles, size, solutionMoves)) {
+      return shuffleSolvable(size);
+    }
+
+    return { tiles, blank, solutionMoves };
   }
 
   function starsForMoves(size, moves) {
@@ -789,8 +814,11 @@
   }
 
   async function beginGame() {
+    clearPendingTutorialHint();
+    clearHintVisual();
     state.moves = 0;
     state.previewLeft = PREVIEW_MAX;
+    state.hintMoves = [];
     state.animating = false;
     state.solved = false;
     elWin.hidden = true;
@@ -803,6 +831,7 @@
     const shuffled = shuffleSolvable(state.size);
     state.tiles = shuffled.tiles;
     state.blank = shuffled.blank;
+    state.hintMoves = shuffled.solutionMoves;
 
     updateHud();
     renderBoard(false);
@@ -811,14 +840,9 @@
     // Tutorial hint for level 1
     if (state.mode === 'levels' && state.level === 1) {
       elTutorial.hidden = false;
-      // one-time visual hint: pulse a movable tile
-      setTimeout(() => {
-        const movables = neighbors(state.blank, state.size);
-        if (movables.length) {
-          const el = elBoard.querySelector(`[data-index="${movables[0]}"]`);
-          if (el) el.classList.add('is-hint');
-        }
-      }, 400);
+      elTutorial.textContent = 'Ketuk atau geser ubin di samping lubang bintang ⭐!';
+      // One-time visual hint also demonstrates the dedicated help button.
+      tutorialHintTimer = setTimeout(() => showHint(false), 400);
     } else {
       elTutorial.hidden = true;
     }
@@ -842,6 +866,7 @@
       elBtnNext.hidden = false;
     }
     elPreviewLeft.textContent = `(${state.previewLeft})`;
+    elBtnHint.disabled = state.solved || state.hintMoves.length === 0;
     $('btn-preview').disabled = state.previewLeft <= 0 || state.solved;
   }
 
@@ -910,6 +935,67 @@
         tile.classList.add('is-moving');
         setTimeout(() => tile.classList.remove('is-moving'), SLIDE_MS);
       }
+    }
+  }
+
+  // ---------- contextual solution hint ----------
+  let tutorialHintTimer = null;
+
+  function clearPendingTutorialHint() {
+    if (tutorialHintTimer != null) {
+      clearTimeout(tutorialHintTimer);
+      tutorialHintTimer = null;
+    }
+  }
+
+  function clearHintVisual(hideMessage = true) {
+    elBoard.querySelectorAll('.tile.is-hint').forEach((tile) => {
+      tile.classList.remove('is-hint');
+      tile.style.removeProperty('--hint-rotation');
+    });
+    if (hideMessage) elTutorial.hidden = true;
+  }
+
+  function hintDirection(tileIdx, blankIdx) {
+    const tile = indexToRC(tileIdx, state.size);
+    const blank = indexToRC(blankIdx, state.size);
+    if (blank.c > tile.c) return { label: 'kanan', rotation: '0deg' };
+    if (blank.c < tile.c) return { label: 'kiri', rotation: '180deg' };
+    if (blank.r > tile.r) return { label: 'bawah', rotation: '90deg' };
+    return { label: 'atas', rotation: '-90deg' };
+  }
+
+  function showHint(withSound = true) {
+    clearPendingTutorialHint();
+    if (state.animating || state.solved || state.hintMoves.length === 0) return false;
+
+    const value = state.hintMoves[0];
+    const tileIdx = state.tiles.indexOf(value);
+    if (!neighbors(state.blank, state.size).includes(tileIdx)) return false;
+
+    clearHintVisual(false);
+    const tile = elBoard.querySelector(`[data-value="${value}"]`);
+    if (!tile) return false;
+
+    const direction = hintDirection(tileIdx, state.blank);
+    tile.style.setProperty('--hint-rotation', direction.rotation);
+    tile.classList.add('is-hint');
+    elTutorial.textContent = `Geser ubin bercahaya ke ${direction.label} menuju lubang bintang ⭐.`;
+    elTutorial.hidden = false;
+    if (withSound) sfxPop();
+    return true;
+  }
+
+  /**
+   * A move matching the next hint consumes that step. Any other legal move
+   * can always be undone by moving the same tile back, so prepend it before
+   * the previously valid route.
+   */
+  function updateHintPathAfterMove(value) {
+    if (state.hintMoves[0] === value) {
+      state.hintMoves.shift();
+    } else {
+      state.hintMoves.unshift(value);
     }
   }
 
@@ -1065,9 +1151,12 @@
     const blankIdx = state.blank;
     if (!neighbors(blankIdx, state.size).includes(tileIdx)) return false;
 
+    clearPendingTutorialHint();
+    clearHintVisual();
     state.tiles[blankIdx] = value;
     state.tiles[tileIdx] = blankVal;
     state.blank = tileIdx;
+    updateHintPathAfterMove(value);
     state.moves++;
     sfxPop();
     updateHud();
@@ -1079,12 +1168,13 @@
       if (isSolved(state.tiles)) onWin();
     }, SLIDE_MS + 10);
 
-    if (!elTutorial.hidden) elTutorial.hidden = true;
     return true;
   }
 
   function onWin() {
     state.solved = true;
+    clearPendingTutorialHint();
+    clearHintVisual();
     sfxJingle();
 
     let stars = 0;
@@ -1115,6 +1205,7 @@
       elWinStars.textContent = '✨✨✨';
       elWinDetail.textContent = `Selesai dalam ${state.moves} gerakan · Mode Santai`;
       elBtnNext.hidden = true;
+      updateHud();
     }
 
     spawnConfetti();
@@ -1138,6 +1229,8 @@
 
   function doShuffle() {
     if (state.animating) return;
+    clearPendingTutorialHint();
+    clearHintVisual();
     state.moves = 0;
     state.solved = false;
     state.previewLeft = PREVIEW_MAX;
@@ -1146,6 +1239,7 @@
     const shuffled = shuffleSolvable(state.size);
     state.tiles = shuffled.tiles;
     state.blank = shuffled.blank;
+    state.hintMoves = shuffled.solutionMoves;
     updateHud();
     renderBoard(false);
     sfxWhoosh();
@@ -1177,9 +1271,12 @@
     sfxPop();
   });
   $('btn-start-chill').addEventListener('click', () => startChill());
+  elBtnHint.addEventListener('click', () => showHint());
   $('btn-shuffle').addEventListener('click', doShuffle);
   $('btn-preview').addEventListener('click', doPreview);
   $('btn-menu').addEventListener('click', () => {
+    clearPendingTutorialHint();
+    clearHintVisual();
     setChillVisible(false);
     showScreen('menu');
     renderMenu();
@@ -1225,6 +1322,7 @@
     shuffleSolvable,
     inversionCount,
     isSolved,
+    doesHintPathSolve,
     blankValue,
     STORAGE_KEY
   };

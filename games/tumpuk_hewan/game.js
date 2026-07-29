@@ -43,8 +43,10 @@
   const STORAGE_SOUND = "dulinan_tumpuk_hewan_sound";
   const FIXED_STEP = 1 / 120;
   const MAX_FRAME = 1 / 18;
-  const BASE_GRAVITY = 980;
+  const BASE_GRAVITY = 820;
   const PLATFORM_HEIGHT = 24;
+  const PLATFORM_SIDE_MARGIN = 18;
+  const AIM_SAFE_INSET = 4;
   const COLORS = {
     outline: "#244956",
     cream: "#fff7dc",
@@ -141,8 +143,9 @@
       angularVelocity: 0,
       invMass: 0,
       invInertia: 0,
-      restitution: 0.02,
-      friction: 0.82,
+      // Platform sengaja benar-benar statis dan tidak memantulkan hewan.
+      restitution: 0,
+      friction: 0.94,
       isStatic: true
     };
   }
@@ -172,8 +175,11 @@
     canvas.height = Math.round(view.height * view.dpr);
     view.centerX = view.width / 2;
     view.platformY = view.height - clamp(view.height * 0.185, 132, 158);
-    const platformMax = view.width >= 768 ? 440 : 310;
-    view.platformWidth = clamp(view.width - 78, 238, platformMax);
+    view.platformWidth = clamp(
+      view.width - PLATFORM_SIDE_MARGIN * 2,
+      250,
+      430
+    );
     view.aimY = clamp(view.height * 0.225, 148, 190);
 
     const shiftX = view.centerX - previousCenter;
@@ -268,7 +274,8 @@
 
   function createBody(animal, x, y) {
     const mass = clamp((animal.width * animal.height) / 3300, .85, 1.8);
-    const inertia = mass * (animal.width ** 2 + animal.height ** 2) / 12;
+    // Inersia tambahan membuat hewan lebih sulit terpelanting/berputar.
+    const inertia = mass * (animal.width ** 2 + animal.height ** 2) / 12 * 1.35;
     return {
       id: `animal-${state.bodyCounter += 1}`,
       animal,
@@ -278,14 +285,14 @@
       height: animal.height,
       angle: 0,
       vx: 0,
-      vy: 28,
+      vy: 20,
       angularVelocity: 0,
       mass,
       invMass: 1 / mass,
       inertia,
       invInertia: 1 / inertia,
-      restitution: .035,
-      friction: .68,
+      restitution: 0,
+      friction: .82,
       isStatic: false,
       touching: false,
       hasLanded: false,
@@ -344,8 +351,8 @@
   function constrainAim() {
     if (!state.currentAnimal) return;
     const half = state.currentAnimal.width / 2;
-    const left = platform.x - platform.width / 2 + half - 9;
-    const right = platform.x + platform.width / 2 - half + 9;
+    const left = platform.x - platform.width / 2 + half + AIM_SAFE_INSET;
+    const right = platform.x + platform.width / 2 - half - AIM_SAFE_INSET;
     state.aimX = clamp(state.aimX, left, right);
   }
 
@@ -673,7 +680,7 @@
   }
 
   function simulate(step) {
-    const gravity = BASE_GRAVITY + Math.min(state.score * 10, 110);
+    const gravity = BASE_GRAVITY;
     for (const body of state.bodies) {
       body.touching = false;
       body.vy += gravity * step;
@@ -711,11 +718,11 @@
 
     for (const body of state.bodies) {
       if (body.touching) {
-        body.vx *= Math.pow(.987, step * 120);
-        body.angularVelocity *= Math.pow(.982, step * 120);
-        if (Math.abs(body.vy) < 2.4) body.vy = 0;
-        if (Math.abs(body.vx) < .28) body.vx = 0;
-        if (Math.abs(body.angularVelocity) < .003) body.angularVelocity = 0;
+        body.vx *= Math.pow(.975, step * 120);
+        body.angularVelocity *= Math.pow(.96, step * 120);
+        if (Math.abs(body.vy) < 3.2) body.vy = 0;
+        if (Math.abs(body.vx) < .4) body.vx = 0;
+        if (Math.abs(body.angularVelocity) < .005) body.angularVelocity = 0;
       }
     }
 
@@ -815,15 +822,15 @@
 
     const maxLinearSpeed = Math.max(...state.bodies.map((body) => Math.hypot(body.vx, body.vy)), 0);
     const maxAngularSpeed = Math.max(...state.bodies.map((body) => Math.abs(body.angularVelocity)), 0);
-    const stable = state.droppedBody.hasLanded && maxLinearSpeed < 22 && maxAngularSpeed < .3;
+    const stable = state.droppedBody.hasLanded && maxLinearSpeed < 30 && maxAngularSpeed < .4;
     if (stable) {
       state.settleTime += delta;
     } else {
       state.settleTime = Math.max(0, state.settleTime - delta * .6);
     }
 
-    if (state.settleTime > .38
-      || (state.dropElapsed > 3.2 && state.droppedBody.hasLanded && maxLinearSpeed < 38 && maxAngularSpeed < .7)) {
+    if (state.settleTime > .28
+      || (state.dropElapsed > 2.8 && state.droppedBody.hasLanded && maxLinearSpeed < 44 && maxAngularSpeed < .8)) {
       finishLanding();
     }
   }
@@ -1646,7 +1653,12 @@
       best: state.best,
       bodies: state.bodies.length,
       current: state.currentAnimal?.id || null,
-      next: state.nextAnimal?.id || null
+      next: state.nextAnimal?.id || null,
+      gravity: BASE_GRAVITY,
+      platformWidth: platform.width,
+      platformStatic: platform.isStatic,
+      platformRestitution: platform.restitution,
+      droppedRestitution: state.droppedBody?.restitution ?? null
     }),
     start: resetGame,
     dropAt: (ratio = .5) => {

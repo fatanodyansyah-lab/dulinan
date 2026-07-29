@@ -81,6 +81,28 @@ Struktur:
 Alur: Start → Dress(Rumi → Mira → Zoey) → Stage. Dari stage, ketuk gadis
 untuk edit ulang lalu "Kembali ke Panggung". "Main Lagi" reset semua outfit.
 
+## Game: Telepon Huntrix (`games/telepon_huntrix/`)
+
+Game edukasi angka bertema panggilan video. Anak memilih Rumi, Mira, atau
+Zoey, lalu menyelesaikan lima soal mencocokkan angka 1–9 melalui keypad besar.
+Jawaban benar memberi bunyi dan kemajuan bintang; jawaban keliru memberi
+petunjuk ramah tanpa mengurangi kesempatan bermain. Setelah semua angka cocok,
+layar menampilkan animasi menghubungi dan memutar video karakter yang dipilih.
+
+Struktur:
+
+- `index.html` — empat layar: pilih kontak, cocokkan angka, menghubungi, dan
+  panggilan video.
+- `style.css` — UI telepon warna-warni yang mobile-first, responsif terhadap
+  layar pendek, safe area iOS, dan preferensi reduced motion.
+- `game.js` — state machine permainan, urutan angka acak, umpan balik suara
+  Web Audio, getaran opsional, pemutar video, dan kontrol keyboard 1–9.
+- `assets/` — foto dan video Rumi, Mira, dan Zoey serta font Baloo 2 lokal.
+
+Kontrol: ketuk gambar teman, lalu ketuk angka yang sama dengan angka besar di
+atas. Tombol 1–9 pada keyboard juga didukung. Tombol suara berlaku untuk efek
+permainan sekaligus audio video.
+
 ## Game: Golden Piano Tiles (`games/golden_piano_tiles/`)
 
 Rhythm/tap game ala Piano Tiles bertema emas: ubin jatuh di 3 lajur

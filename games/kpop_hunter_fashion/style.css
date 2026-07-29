@@ -554,3 +554,177 @@ button {
     padding-bottom: calc(22px + env(safe-area-inset-bottom));
   }
 }
+
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  #app {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  #homeBtn {
+    top: max(16px, env(safe-area-inset-top));
+    right: max(20px, env(safe-area-inset-right));
+    width: 46px;
+    height: 46px;
+  }
+
+  .screen {
+    min-height: 100dvh;
+  }
+
+  .screen-start {
+    display: grid;
+    grid-template-columns: minmax(250px, .9fr) minmax(340px, 1.1fr);
+    grid-template-rows: auto auto auto auto;
+    align-content: center;
+    justify-items: center;
+    column-gap: clamp(30px, 5vw, 76px);
+    row-gap: 15px;
+    padding: 36px max(34px, 5vw);
+  }
+
+  .screen-start .badge,
+  .screen-start .title-start,
+  .screen-start .subtitle {
+    grid-column: 1;
+  }
+
+  .screen-start .title-start {
+    font-size: clamp(44px, 5vw, 60px);
+  }
+
+  .screen-start .subtitle {
+    max-width: 390px;
+    font-size: 18px;
+  }
+
+  .screen-start .minis-row {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: end;
+    gap: 18px;
+  }
+
+  .screen-start .mini-doll {
+    width: clamp(92px, 10vw, 126px);
+  }
+
+  .screen-start .btn-primary {
+    grid-column: 2;
+    grid-row: 4;
+    min-width: 260px;
+  }
+
+  .screen-start .hint-chip {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .screen-dress {
+    display: grid;
+    grid-template-columns: minmax(260px, .82fr) minmax(390px, 1.18fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    height: 100dvh;
+  }
+
+  .dress-header {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding: 12px 76px 6px 20px;
+  }
+
+  .girl-tabs {
+    gap: 12px;
+  }
+
+  .girl-tab {
+    width: 70px;
+  }
+
+  .char-stage {
+    grid-column: 1;
+    grid-row: 2 / 5;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    align-self: stretch;
+  }
+
+  .spotlight-dress {
+    width: 190px;
+    height: 90%;
+    margin-left: -95px;
+  }
+
+  .doll-dress {
+    width: clamp(170px, 19vw, 230px);
+    margin-bottom: 36px;
+  }
+
+  .cat-tabs {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 8px 18px 10px;
+  }
+
+  .cat-tab {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 66px;
+  }
+
+  .item-grid-wrap {
+    grid-column: 2;
+    grid-row: 3;
+    padding: 4px 18px 10px;
+  }
+
+  .item-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .item-card {
+    padding: 9px 8px;
+  }
+
+  .item-thumb {
+    height: clamp(64px, 10dvh, 82px);
+  }
+
+  .dress-footer {
+    grid-column: 2;
+    grid-row: 4;
+    padding: 9px 18px max(18px, env(safe-area-inset-bottom));
+  }
+
+  .screen-stage {
+    padding: 72px 34px max(20px, env(safe-area-inset-bottom));
+    justify-content: flex-end;
+  }
+
+  .title-stage {
+    font-size: clamp(42px, 5vw, 58px);
+  }
+
+  .stage-dolls {
+    gap: clamp(18px, 4vw, 56px);
+  }
+
+  .stage-doll-svg {
+    width: clamp(145px, 17vw, 205px);
+  }
+
+  .stage-floor-lg {
+    max-width: 900px;
+  }
+
+  .stage-hint {
+    margin: 5px 0 6px;
+    font-size: 14px;
+  }
+}

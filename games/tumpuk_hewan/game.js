@@ -172,7 +172,8 @@
     canvas.height = Math.round(view.height * view.dpr);
     view.centerX = view.width / 2;
     view.platformY = view.height - clamp(view.height * 0.185, 132, 158);
-    view.platformWidth = clamp(view.width - 78, 238, 310);
+    const platformMax = view.width >= 768 ? 440 : 310;
+    view.platformWidth = clamp(view.width - 78, 238, platformMax);
     view.aimY = clamp(view.height * 0.225, 148, 190);
 
     const shiftX = view.centerX - previousCenter;

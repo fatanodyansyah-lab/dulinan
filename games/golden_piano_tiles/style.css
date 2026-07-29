@@ -603,3 +603,99 @@ html, body {
 #stage.shake {
   animation: shake 0.28s ease;
 }
+
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  #stage {
+    width: min(88vw, 680px);
+    max-width: 680px;
+    max-height: none;
+    border-right: 1px solid rgba(255, 224, 122, .22);
+    border-left: 1px solid rgba(255, 224, 122, .22);
+    box-shadow: 0 0 70px rgba(0, 0, 0, .5);
+  }
+
+  #homeBtn {
+    top: 16px;
+    width: 46px;
+    height: 46px;
+  }
+
+  #hud {
+    padding: 16px 20px 0;
+  }
+
+  .hudChip {
+    min-width: 112px;
+    padding: 8px 18px;
+  }
+
+  .hudScore {
+    font-size: 30px;
+  }
+
+  .progressTrack {
+    margin-top: 8px;
+  }
+
+  #menuScreen {
+    display: grid;
+    grid-template-columns: minmax(230px, .9fr) minmax(280px, 1.1fr);
+    grid-template-rows: auto auto auto auto;
+    align-content: center;
+    column-gap: 32px;
+    row-gap: 13px;
+    padding: 28px 38px;
+  }
+
+  #menuScreen .titleBlock {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: end;
+  }
+
+  #menuScreen .titleMain {
+    font-size: clamp(60px, 8vw, 78px);
+  }
+
+  #menuScreen .instrCard {
+    grid-column: 1;
+    grid-row: 3;
+    max-width: none;
+    align-self: start;
+  }
+
+  #menuScreen .speedBlock {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: none;
+    align-self: end;
+  }
+
+  #menuScreen .highScoreLine {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  #menuScreen .btnGold {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: center;
+    min-width: 230px;
+  }
+
+  #menuScreen .footerNote {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
+
+  #overScreen.overlay {
+    flex-direction: row;
+    gap: 24px;
+  }
+
+  #overScreen .resultCard {
+    min-width: 290px;
+  }
+}

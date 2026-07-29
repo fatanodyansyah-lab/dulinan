@@ -364,3 +364,100 @@ button {
     transition-duration: .001ms !important;
   }
 }
+
+/* ---------- tablet landscape ---------- */
+
+@media (min-width: 768px) and (min-height: 560px) and (orientation: landscape) {
+  .app-shell {
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .deco-blob {
+    top: -105px;
+    right: 3%;
+    width: 330px;
+    height: 330px;
+  }
+
+  .twinkle-1 { top: 92px; left: 5%; }
+  .twinkle-2 { top: 170px; right: 8%; }
+  .twinkle-3 { top: 54px; left: 32%; }
+
+  .home-header {
+    padding: max(24px, calc(env(safe-area-inset-top) + 16px)) 40px 12px;
+    gap: 16px;
+  }
+
+  .brand-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+  }
+
+  .app-title {
+    font-size: 36px;
+  }
+
+  .subtitle {
+    margin-top: 5px;
+    font-size: 17px;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(14px, 1.8vw, 22px);
+    align-content: center;
+    padding: 8px 40px max(28px, calc(env(safe-area-inset-bottom) + 18px));
+  }
+
+  .game-card {
+    min-height: clamp(154px, 24dvh, 218px);
+    padding: 18px 14px 16px;
+    display: grid;
+    place-items: center;
+  }
+
+  .game-icon {
+    width: clamp(68px, 8vw, 84px);
+    height: clamp(68px, 8vw, 84px);
+    font-size: clamp(38px, 4.6vw, 48px);
+  }
+
+  .game-name {
+    font-size: clamp(17px, 2vw, 21px);
+  }
+
+  .game-tag {
+    font-size: 13px;
+  }
+
+  .play-overlay {
+    padding: 40px;
+  }
+
+  .back-btn {
+    top: max(22px, calc(env(safe-area-inset-top) + 12px));
+    left: max(28px, calc(env(safe-area-inset-left) + 18px));
+    padding: 10px 20px 10px 15px;
+    font-size: 17px;
+  }
+
+  .orbit-ring {
+    width: 148px;
+    height: 148px;
+    margin-bottom: 26px;
+  }
+
+  .orbit-center {
+    font-size: 60px;
+  }
+
+  .play-game-name {
+    font-size: 32px;
+  }
+
+  .progress-track {
+    width: 250px;
+  }
+}

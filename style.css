@@ -75,75 +75,35 @@ button {
 }
 
 .home-header {
-  padding: 58px 24px 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.mascot {
-  position: relative;
-  width: 52px;
-  height: 52px;
   flex: 0 0 auto;
-  animation: bob 4s ease-in-out infinite;
-}
-.mascot-face {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #8f7bff, #5b46d6);
-  box-shadow: 0 6px 16px rgba(91,70,214,.45);
-}
-.mascot-eye {
-  position: absolute;
-  top: 14px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #fff;
-}
-.mascot-eye-left { left: 10px; }
-.mascot-eye-right { right: 12px; }
-.mascot-pupil {
-  position: absolute;
-  top: 17px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #2b2d6e;
-}
-.mascot-pupil-left { left: 12px; }
-.mascot-pupil-right { right: 14px; }
-.mascot-mouth {
-  position: absolute;
-  bottom: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 14px;
-  height: 7px;
-  border-radius: 0 0 10px 10px;
-  background: #2b2d6e;
+  padding: max(10px, env(safe-area-inset-top)) 20px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.title-block {
-  flex: 1;
-  min-width: 0;
-}
-.app-title {
+.brand-heading {
   margin: 0;
-  font-family: 'Baloo 2', cursive;
-  font-weight: 800;
-  font-size: 28px;
-  line-height: 1;
-  color: #3a2a6d;
-  letter-spacing: -.5px;
+  line-height: 0;
 }
+
+.brand-logo {
+  display: block;
+  width: auto;
+  height: clamp(140px, 24dvh, 205px);
+  max-width: min(84vw, 340px);
+  object-fit: contain;
+  filter: drop-shadow(0 10px 15px rgba(43,45,110,.16));
+  animation: brand-float 4s ease-in-out infinite;
+}
+
 .subtitle {
-  margin: 3px 0 0;
+  margin: -7px 0 4px;
   font-size: 14px;
   color: #c06a3e;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* ---------- games grid ---------- */
@@ -383,9 +343,9 @@ button {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-@keyframes bob {
-  0%, 100% { transform: translateY(0) rotate(-4deg); }
-  50% { transform: translateY(-10px) rotate(4deg); }
+@keyframes brand-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

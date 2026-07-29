@@ -1,6 +1,36 @@
 (() => {
 'use strict';
 
+// ---------- block accidental zoom (iOS ignores user-scalable=no) ----------
+(function blockZoom() {
+  const stopMulti = (e) => {
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+  };
+  document.addEventListener('touchstart', stopMulti, { passive: false });
+  document.addEventListener('touchmove', stopMulti, { passive: false });
+
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((type) => {
+    document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+  });
+
+  let lastTap = { t: 0, x: 0, y: 0 };
+  document.addEventListener('touchend', (e) => {
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+    const now = Date.now();
+    const x = touch.clientX;
+    const y = touch.clientY;
+    const dt = now - lastTap.t;
+    const dist = Math.hypot(x - lastTap.x, y - lastTap.y);
+    if (dt <= 300 && dist < 28) e.preventDefault();
+    lastTap = { t: now, x, y };
+  }, { passive: false });
+
+  document.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) e.preventDefault();
+  }, { passive: false });
+})();
+
 // ---------- tunable parameters ----------
 const TEMPO = 92;          // bpm, 60-140
 const FALL_SECONDS = 2.6;  // note fall time, 1.4-4 (difficulty)

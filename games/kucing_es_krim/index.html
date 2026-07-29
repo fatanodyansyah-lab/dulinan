@@ -5,13 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Kucing Es Krim</title>
 <style>
-  html,body{margin:0;padding:0;height:100%;background:#3a2a24;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+  html,body{margin:0;padding:0;height:100%;background:#3a2a24;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none}
   canvas{display:block;margin:0 auto;touch-action:none}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <script>
+// ---------- block accidental zoom (iOS ignores user-scalable=no) ----------
+(function blockZoom() {
+  const stopMulti = (e) => {
+    if (e.touches && e.touches.length > 1) e.preventDefault();
+  };
+  document.addEventListener('touchstart', stopMulti, { passive: false });
+  document.addEventListener('touchmove', stopMulti, { passive: false });
+
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach((type) => {
+    document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+  });
+
+  let lastTap = { t: 0, x: 0, y: 0 };
+  document.addEventListener('touchend', (e) => {
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+    const now = Date.now();
+    const x = touch.clientX;
+    const y = touch.clientY;
+    const dt = now - lastTap.t;
+    const dist = Math.hypot(x - lastTap.x, y - lastTap.y);
+    if (dt <= 300 && dist < 28) e.preventDefault();
+    lastTap = { t: now, x, y };
+  }, { passive: false });
+
+  document.addEventListener('wheel', (e) => {
+    if (e.ctrlKey) e.preventDefault();
+  }, { passive: false });
+})();
+
 const W=480,H=854;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let scale=1;

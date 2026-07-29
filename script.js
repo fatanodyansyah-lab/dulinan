@@ -1,4 +1,34 @@
 (() => {
+  // ---------- block accidental zoom (iOS ignores user-scalable=no) ----------
+  (function blockZoom() {
+    const stopMulti = (e) => {
+      if (e.touches && e.touches.length > 1) e.preventDefault();
+    };
+    document.addEventListener('touchstart', stopMulti, { passive: false });
+    document.addEventListener('touchmove', stopMulti, { passive: false });
+
+    ['gesturestart', 'gesturechange', 'gestureend'].forEach((type) => {
+      document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+    });
+
+    let lastTap = { t: 0, x: 0, y: 0 };
+    document.addEventListener('touchend', (e) => {
+      const touch = e.changedTouches && e.changedTouches[0];
+      if (!touch) return;
+      const now = Date.now();
+      const x = touch.clientX;
+      const y = touch.clientY;
+      const dt = now - lastTap.t;
+      const dist = Math.hypot(x - lastTap.x, y - lastTap.y);
+      if (dt <= 300 && dist < 28) e.preventDefault();
+      lastTap = { t: now, x, y };
+    }, { passive: false });
+
+    document.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+  })();
+
   const PALETTE = [
     { bg: 'linear-gradient(135deg,#ff8fb1,#ff5e8a)', shadow: 'rgba(255,94,138,.4)', playColor: '#ff5e8a' },
     { bg: 'linear-gradient(135deg,#7ad0ff,#3aa0ff)', shadow: 'rgba(58,160,255,.4)', playColor: '#3aa0ff' },

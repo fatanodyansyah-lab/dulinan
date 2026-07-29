@@ -109,7 +109,6 @@ jatuh ubin, kepadatan beatmap, dan hit window. Mode Lambat dirancang
 untuk anak usia 3–4 tahun: ubin jauh lebih jarang, waktu jatuh lebih
 panjang, tanpa pola setengah-beat, dan waktu ketuk lebih longgar.
 
-<<<<<<< HEAD
 ## Game: Tumpuk Hewan (`games/tumpuk_hewan/`)
 
 Game keseimbangan endless: geser hewan yang menunggu ke kiri/kanan,
@@ -130,7 +129,7 @@ Struktur:
 Kontrol: drag di area permainan atau panah kiri/kanan untuk memilih posisi;
 tekan tombol **JATUHKAN!**, Space, atau Enter untuk melepas hewan. Rekor dan
 pilihan suara tersimpan di `localStorage`.
-=======
+
 ## Game: Crocodile Dentist (`games/crocodile_dentist/`)
 
 Game keberuntungan sederhana untuk anak: tekan gigi buaya pada rahang atas
@@ -142,7 +141,6 @@ Ilustrasi buaya, hutan, gigi, serta animasi gigitan dibuat sepenuhnya dengan
 HTML/CSS. `game.js` mengatur gigi jebakan acak, state ronde, skor terbaik di
 `localStorage`, Web Audio, getaran perangkat, akses keyboard, dan mode tanpa
 animasi bagi pengguna yang mengaktifkan `prefers-reduced-motion`.
->>>>>>> origin/task/xwtkveuc-crocodile-dentist
 
 ## Menambah game baru
 

@@ -167,6 +167,43 @@ HTML/CSS. `game.js` mengatur gigi jebakan acak, state ronde, skor terbaik di
 `localStorage`, Web Audio, getaran perangkat, akses keyboard, dan mode tanpa
 animasi bagi pengguna yang mengaktifkan `prefers-reduced-motion`.
 
+## Game: Suku Kata Seru (`games/suku_kata_seru/`)
+
+Game edukasi membaca untuk anak, dengan voiceover Bahasa Indonesia (Web Speech
+API) yang membaca suku kata setiap kali diketuk dan membaca kata lengkap
+setiap kali berhasil. Terbagi tiga bagian seperti pada handoff desain:
+
+1. **Sambung Suku Kata** — tarik suku kata kedua (potongan puzzle) ke suku
+   kata pertama di sebelah gambar sampai membentuk kata yang tepat
+   (mis. gajah = "ga" + "jah").
+2. **Susun Kata** — seret suku kata yang tepat dari bank suku kata (berisi
+   beberapa suku kata jebakan) ke kotak kosong di bawah tiap gambar.
+3. **Cari Kata** — seret jari menyusuri grid huruf untuk menemukan kata yang
+   terdaftar (PALU, BUKU, TOPI, DASI).
+
+Setiap kata benar memberi bunyi, skor, dan getaran; jawaban keliru hanya
+memberi umpan balik ramah (goyang + bunyi lembut) tanpa mengurangi kesempatan
+bermain atau mengakhiri sesi. Layar akhir menampilkan skor total dan bintang
+berdasarkan jumlah percobaan keliru.
+
+Struktur:
+
+- `index.html` — layar awal, tiga layar permainan (Bagian 1/2/3), dan layar
+  akhir.
+- `style.css` — tema pink/kuning ala handoff, papan bertekstur wavy,
+  potongan puzzle suku kata, kartu susun kata, dan grid pencarian kata.
+- `game.js` — state machine tiga bagian, drag & drop berbasis Pointer Events
+  (drag-follow + deteksi drop zone via `elementFromPoint`), seleksi garis
+  lurus untuk pencarian kata, voiceover Speech Synthesis (`id-ID`) saat
+  suku kata diketuk maupun saat kata berhasil, Web Audio untuk efek
+  benar/salah/menang, timer per ronde yang mengulang tanpa menghukum
+  pemain, dan skor/bintang akhir.
+- `assets/` — font Baloo 2 lokal.
+
+Kontrol: ketuk gambar atau suku kata untuk mendengarnya, lalu seret (drag)
+suku kata ke tempat yang tepat. Tombol suara di pojok kanan atas mengatur
+voiceover dan efek bunyi.
+
 ## Menambah game baru
 
 1. Buat folder `games/<nama_game>/` dengan `index.html` sendiri (boleh

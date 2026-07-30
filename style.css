@@ -555,6 +555,26 @@ button:focus-visible {
   transform: translateX(-52%) scaleX(.8);
 }
 
+.game-sprite.suku-art {
+  position: relative;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.14) 0 10px, transparent 10px 20px),
+    linear-gradient(160deg, #ff8fc4 0%, #ff4fa0 55%, #b23fe0 100%);
+}
+
+.game-sprite.suku-art::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  content: '📖';
+  font-size: clamp(44px, 15vw, 72px);
+  filter: drop-shadow(0 4px 6px rgba(60,10,50,.3));
+}
+
 .card-star {
   position: absolute;
   z-index: 2;

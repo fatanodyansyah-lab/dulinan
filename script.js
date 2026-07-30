@@ -129,6 +129,18 @@
       spriteY: '0%',
       url: 'games/bowling_pelangi/index.html',
     },
+    {
+      name: 'Suku Kata Seru',
+      tag: 'Belajar Membaca',
+      tagIcon: '📖',
+      theme: 'theme-candy',
+      overlay: 'linear-gradient(145deg, #ff8fc4, #b23fe0)',
+      playColor: '#c22bd6',
+      artClass: 'suku-art',
+      spriteX: '0%',
+      spriteY: '0%',
+      url: 'games/suku_kata_seru/index.html',
+    },
   ];
 
   const homeScreen = document.getElementById('home-screen');

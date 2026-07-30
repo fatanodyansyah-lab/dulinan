@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#ff4fa0">
+  <meta name="description" content="Suku Kata Seru — game edukasi membaca untuk anak: sambung, susun, dan cari kata dengan voiceover suku kata.">
+  <title>Suku Kata Seru 📖</title>
+  <link rel="preload" href="assets/Baloo2.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <main class="app" id="app">
+
+    <button class="icon-btn sound-btn" id="soundBtn" type="button" aria-label="Matikan suara" aria-pressed="false">
+      <span aria-hidden="true">🔊</span>
+    </button>
+
+    <!-- LAYAR AWAL -->
+    <section class="screen screen-start" id="screenStart">
+      <a class="icon-btn back-btn" href="../../index.html" aria-label="Kembali ke menu utama">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" fill="currentColor"/></svg>
+      </a>
+      <div class="start-card">
+        <p class="eyebrow">DULINAN SPACE</p>
+        <div class="start-mascot" aria-hidden="true">📖✨</div>
+        <h1>Suku Kata<br><span>Seru</span></h1>
+        <p class="start-copy">Sambung, susun, dan temukan kata sambil belajar membaca suku kata!</p>
+
+        <div class="part-legend" aria-hidden="true">
+          <div class="part-chip"><span class="part-emoji">🧩</span><span>Sambung Kata</span></div>
+          <div class="part-chip"><span class="part-emoji">🔤</span><span>Susun Kata</span></div>
+          <div class="part-chip"><span class="part-emoji">🔍</span><span>Cari Kata</span></div>
+        </div>
+
+        <button class="primary-btn" id="startBtn" type="button">
+          <span>Mulai Main</span>
+          <span aria-hidden="true">▶</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- BAGIAN 1: SAMBUNG SUKU KATA -->
+    <section class="screen screen-game" id="screenPart1" hidden>
+      <header class="hud">
+        <a class="icon-btn hud-back" href="../../index.html" aria-label="Kembali ke menu utama">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" fill="currentColor"/></svg>
+        </a>
+        <span class="hud-part-label">Bagian 1 · Sambung Suku Kata</span>
+        <div class="hud-chips">
+          <div class="chip chip-score"><span aria-hidden="true">✔</span><strong id="scoreValue1">0</strong></div>
+          <div class="chip chip-timer" id="timerChip1"><span aria-hidden="true">⏱</span><strong id="timerValue1">02:00</strong></div>
+        </div>
+      </header>
+      <p class="hud-instruction">Tarik suku kata kedua ke suku kata pertama sampai membentuk kata yang tepat!</p>
+      <div class="board board-connect" id="board1"></div>
+    </section>
+
+    <!-- BAGIAN 2: SUSUN KATA -->
+    <section class="screen screen-game" id="screenPart2" hidden>
+      <header class="hud">
+        <a class="icon-btn hud-back" href="../../index.html" aria-label="Kembali ke menu utama">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" fill="currentColor"/></svg>
+        </a>
+        <span class="hud-part-label">Bagian 2 · Susun Kata</span>
+        <div class="hud-chips">
+          <div class="chip chip-score"><span aria-hidden="true">✔</span><strong id="scoreValue2">0</strong></div>
+          <div class="chip chip-timer" id="timerChip2"><span aria-hidden="true">⏱</span><strong id="timerValue2">02:00</strong></div>
+        </div>
+      </header>
+      <p class="hud-instruction">Seret suku kata yang tepat ke kotak kosong di bawah gambar!</p>
+      <div class="board board-fill" id="board2"></div>
+      <div class="tile-bank" id="tileBank2"></div>
+    </section>
+
+    <!-- BAGIAN 3: CARI KATA -->
+    <section class="screen screen-game" id="screenPart3" hidden>
+      <header class="hud">
+        <a class="icon-btn hud-back" href="../../index.html" aria-label="Kembali ke menu utama">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3z" fill="currentColor"/></svg>
+        </a>
+        <span class="hud-part-label">Bagian 3 · Cari Kata</span>
+        <div class="hud-chips">
+          <div class="chip chip-score"><span aria-hidden="true">✔</span><strong id="scoreValue3">0</strong></div>
+          <div class="chip chip-timer" id="timerChip3"><span aria-hidden="true">⏱</span><strong id="timerValue3">02:00</strong></div>
+        </div>
+      </header>
+      <p class="word-list" id="wordList3"></p>
+      <div class="wordsearch-grid" id="grid3"></div>
+    </section>
+
+    <!-- LAYAR AKHIR -->
+    <section class="screen screen-end" id="screenEnd" hidden>
+      <div class="end-card">
+        <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+        <div class="end-stars" id="endStars" aria-hidden="true">⭐⭐⭐</div>
+        <h2>Hebat sekali!</h2>
+        <p class="end-copy">Kamu sudah pintar membaca suku kata!</p>
+        <div class="end-score"><span>SKOR TOTAL</span><strong id="endScoreValue">0</strong></div>
+        <button class="primary-btn" id="replayBtn" type="button">
+          <span>Main Lagi</span>
+          <span aria-hidden="true">↻</span>
+        </button>
+        <a class="menu-link" href="../../index.html">Kembali ke pilihan game</a>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <script src="game.js?v=1"></script>
+</body>
+</html>

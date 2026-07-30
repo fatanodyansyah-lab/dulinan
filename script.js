@@ -117,6 +117,18 @@
       spriteY: '100%',
       url: 'games/crocodile_dentist/index.html',
     },
+    {
+      name: 'Bowling Pelangi',
+      tag: 'Ketangkasan',
+      tagIcon: '🎳',
+      theme: 'theme-rainbow',
+      overlay: 'linear-gradient(145deg, #ef45db, #782bc6)',
+      playColor: '#7b2bc2',
+      artClass: 'bowling-art',
+      spriteX: '0%',
+      spriteY: '0%',
+      url: 'games/bowling_pelangi/index.html',
+    },
   ];
 
   const homeScreen = document.getElementById('home-screen');
@@ -141,6 +153,7 @@
   let toastTimer = null;
 
   function setSprite(element, game) {
+    element.classList.toggle('bowling-art', game.artClass === 'bowling-art');
     element.style.setProperty('--sprite-x', game.spriteX);
     element.style.setProperty('--sprite-y', game.spriteY);
   }
@@ -157,7 +170,7 @@
       card.innerHTML = `
         <span class="card-star" aria-hidden="true">★</span>
         <span class="game-art-frame" aria-hidden="true">
-          <span class="game-sprite" style="--sprite-x: ${game.spriteX}; --sprite-y: ${game.spriteY}"></span>
+          <span class="game-sprite ${game.artClass || ''}" style="--sprite-x: ${game.spriteX}; --sprite-y: ${game.spriteY}"></span>
         </span>
         <span class="game-copy">
           <span class="game-name">${game.name}</span>

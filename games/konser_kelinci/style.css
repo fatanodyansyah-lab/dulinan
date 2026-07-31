@@ -52,6 +52,7 @@ button {
   position: relative;
   width: 100vw;
   height: 100dvh;
+  height: var(--app-vh, 100dvh);
   min-height: 480px;
   overflow: hidden;
   isolation: isolate;

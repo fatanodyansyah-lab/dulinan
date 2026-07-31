@@ -28,6 +28,7 @@ body {
   width: 100%;
   min-height: 100%;
   min-height: 100dvh;
+  min-height: var(--app-vh, 100dvh);
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
@@ -72,6 +73,7 @@ canvas:focus-visible {
   width: min(100vw, 600px);
   height: 100vh;
   height: 100dvh;
+  height: var(--app-vh, 100dvh);
   min-height: 540px;
   overflow: hidden;
   background: #d832ed;

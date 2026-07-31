@@ -6,6 +6,19 @@
   <meta name="theme-color" content="#6bcce8">
   <meta name="description" content="Tumpuk Hewan — susun hewan lucu setinggi mungkin tanpa jatuh dari platform rumput.">
   <title>Tumpuk Hewan 🐾</title>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      function setAppViewportHeight() {
+        var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+        root.style.setProperty('--app-vh', h + 'px');
+      }
+      setAppViewportHeight();
+      window.addEventListener('resize', setAppViewportHeight);
+      window.addEventListener('orientationchange', setAppViewportHeight);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', setAppViewportHeight);
+    })();
+  </script>
   <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>

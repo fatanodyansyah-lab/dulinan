@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#15124d">
   <title>Gitar Kelinci</title>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      function setAppViewportHeight() {
+        var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+        root.style.setProperty('--app-vh', h + 'px');
+      }
+      setAppViewportHeight();
+      window.addEventListener('resize', setAppViewportHeight);
+      window.addEventListener('orientationchange', setAppViewportHeight);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', setAppViewportHeight);
+    })();
+  </script>
   <link rel="preload" href="assets/selalu-ada-di-nadimu-30s.mp3" as="audio" type="audio/mpeg">
   <link rel="stylesheet" href="style.css?v=4">
 </head>

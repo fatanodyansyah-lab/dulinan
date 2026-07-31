@@ -7,7 +7,6 @@
     { word: 'ikan', syl: ['i', 'kan'], emoji: '🐟' },
     { word: 'bulan', syl: ['bu', 'lan'], emoji: '🌙' },
   ];
-  const PART1_ROUNDS = [PART1_WORDS.slice(0, 3), PART1_WORDS.slice(3, 6)];
 
   const PART2_WORDS = [
     { word: 'buku', syl: ['bu', 'ku'], emoji: '📖' },
@@ -18,12 +17,6 @@
     { word: 'dasi', syl: ['da', 'si'], emoji: '👔' },
     { word: 'palu', syl: ['pa', 'lu'], emoji: '🔨' },
     { word: 'bola', syl: ['bo', 'la'], emoji: '⚽' },
-  ];
-  const PART2_ROUNDS = [
-    PART2_WORDS.slice(0, 2),
-    PART2_WORDS.slice(2, 4),
-    PART2_WORDS.slice(4, 6),
-    PART2_WORDS.slice(6, 8),
   ];
   const PART2_DISTRACTOR_POOL = ['ka', 'fu', 'me', 'sa', 'ti', 'na', 'ra', 'wo', 'ri', 'ci'];
 
@@ -47,17 +40,20 @@
   const soundBtn = document.getElementById('soundBtn');
   const toast = document.getElementById('toast');
 
+  const hudLabel1 = document.getElementById('hudLabel1');
   const board1 = document.getElementById('board1');
   const scoreValue1 = document.getElementById('scoreValue1');
   const timerChip1 = document.getElementById('timerChip1');
   const timerValue1 = document.getElementById('timerValue1');
 
+  const hudLabel2 = document.getElementById('hudLabel2');
   const board2 = document.getElementById('board2');
   const tileBank2 = document.getElementById('tileBank2');
   const scoreValue2 = document.getElementById('scoreValue2');
   const timerChip2 = document.getElementById('timerChip2');
   const timerValue2 = document.getElementById('timerValue2');
 
+  const hudLabel3 = document.getElementById('hudLabel3');
   const grid3 = document.getElementById('grid3');
   const wordList3 = document.getElementById('wordList3');
   const scoreValue3 = document.getElementById('scoreValue3');
@@ -76,11 +72,8 @@
   let totalScore = 0;
   let totalMistakes = 0;
 
-  let part1RoundIdx = 0;
-  let part1Remaining = 0;
-
-  let part2RoundIdx = 0;
-  let part2Remaining = 0;
+  let part1WordIdx = 0;
+  let part2WordIdx = 0;
   let wordFillState = {};
 
   let selecting = false;
@@ -313,44 +306,45 @@
 
   // ---------- Bagian 1: Sambung Suku Kata ----------
 
-  function loadPart1Round(idx) {
-    const words = PART1_ROUNDS[idx];
+  function loadPart1Word(idx) {
+    const current = PART1_WORDS[idx];
+    hudLabel1.textContent = `Bagian 1 · Sambung Suku Kata · ${idx + 1}/${PART1_WORDS.length}`;
     board1.innerHTML = '';
-    part1Remaining = words.length;
 
-    words.forEach((w) => {
-      const row = document.createElement('div');
-      row.className = 'connect-row';
+    const row = document.createElement('div');
+    row.className = 'connect-row';
 
-      const pic = document.createElement('button');
-      pic.type = 'button';
-      pic.className = 'connect-picture';
-      pic.textContent = w.emoji;
-      pic.setAttribute('aria-label', `Dengar kata ${w.word}`);
-      pic.addEventListener('click', () => speakText(w.word));
+    const pic = document.createElement('button');
+    pic.type = 'button';
+    pic.className = 'connect-picture';
+    pic.textContent = current.emoji;
+    pic.setAttribute('aria-label', `Dengar kata ${current.word}`);
+    pic.addEventListener('click', () => speakText(current.word));
 
-      const slots = document.createElement('div');
-      slots.className = 'connect-slots';
+    const slots = document.createElement('div');
+    slots.className = 'connect-slots';
 
-      const firstPiece = document.createElement('button');
-      firstPiece.type = 'button';
-      firstPiece.className = 'syl-piece piece-first';
-      firstPiece.textContent = w.syl[0];
-      firstPiece.addEventListener('pointerdown', () => speakText(w.syl[0]));
+    const firstPiece = document.createElement('button');
+    firstPiece.type = 'button';
+    firstPiece.className = 'syl-piece piece-first';
+    firstPiece.textContent = current.syl[0];
+    firstPiece.addEventListener('pointerdown', () => speakText(current.syl[0]));
 
-      const dropSlot = document.createElement('div');
-      dropSlot.className = 'drop-slot';
-      dropSlot.dataset.drop = 'part1';
-      dropSlot.dataset.word = w.word;
+    const dropSlot = document.createElement('div');
+    dropSlot.className = 'drop-slot';
+    dropSlot.dataset.drop = 'part1';
+    dropSlot.dataset.word = current.word;
 
-      slots.append(firstPiece, dropSlot);
-      row.append(pic, slots);
-      board1.appendChild(row);
-    });
+    slots.append(firstPiece, dropSlot);
+    row.append(pic, slots);
+    board1.appendChild(row);
+
+    const distractors = shuffle(PART1_WORDS.filter((w) => w.word !== current.word)).slice(0, 2);
+    const bankWords = shuffle([current, ...distractors]);
 
     const bank = document.createElement('div');
     bank.className = 'bank-second';
-    shuffle(words).forEach((w) => {
+    bankWords.forEach((w) => {
       const piece = document.createElement('button');
       piece.type = 'button';
       piece.className = 'syl-piece piece-second';
@@ -361,7 +355,7 @@
     });
     board1.appendChild(bank);
 
-    startTimer(timerChip1, timerValue1, 120);
+    startTimer(timerChip1, timerValue1, 30);
   }
 
   function handlePart1Drop(el, zone, w) {
@@ -387,66 +381,61 @@
     vibrate(30);
     updateScore(10);
 
-    part1Remaining -= 1;
-    if (part1Remaining <= 0) {
-      stopTimer(timerChip1);
-      setTimeout(() => {
-        part1RoundIdx += 1;
-        if (part1RoundIdx < PART1_ROUNDS.length) loadPart1Round(part1RoundIdx);
-        else goToPart2();
-      }, 700);
-    }
+    stopTimer(timerChip1);
+    setTimeout(() => {
+      part1WordIdx += 1;
+      if (part1WordIdx < PART1_WORDS.length) loadPart1Word(part1WordIdx);
+      else goToPart2();
+    }, 700);
     return true;
   }
 
   function goToPart1() {
     showScreen(screenPart1);
     showToast('Bagian 1: Sambung Suku Kata! 🧩');
-    part1RoundIdx = 0;
-    loadPart1Round(0);
+    part1WordIdx = 0;
+    loadPart1Word(0);
   }
 
   // ---------- Bagian 2: Susun Kata ----------
 
-  function loadPart2Round(idx) {
-    const words = PART2_ROUNDS[idx];
+  function loadPart2Word(idx) {
+    const w = PART2_WORDS[idx];
+    hudLabel2.textContent = `Bagian 2 · Susun Kata · ${idx + 1}/${PART2_WORDS.length}`;
     board2.innerHTML = '';
     tileBank2.innerHTML = '';
     wordFillState = {};
-    part2Remaining = words.length;
 
     const cardsWrap = document.createElement('div');
     cardsWrap.className = 'fill-cards';
     const bankSyllables = [];
 
-    words.forEach((w) => {
-      const card = document.createElement('div');
-      card.className = 'fill-card';
+    const card = document.createElement('div');
+    card.className = 'fill-card';
 
-      const pic = document.createElement('button');
-      pic.type = 'button';
-      pic.className = 'fill-picture';
-      pic.textContent = w.emoji;
-      pic.setAttribute('aria-label', `Dengar kata ${w.word}`);
-      pic.addEventListener('click', () => speakText(w.word));
+    const pic = document.createElement('button');
+    pic.type = 'button';
+    pic.className = 'fill-picture';
+    pic.textContent = w.emoji;
+    pic.setAttribute('aria-label', `Dengar kata ${w.word}`);
+    pic.addEventListener('click', () => speakText(w.word));
 
-      const blanksWrap = document.createElement('div');
-      blanksWrap.className = 'fill-blanks';
-      w.syl.forEach((syl) => {
-        const slot = document.createElement('div');
-        slot.className = 'blank-slot';
-        slot.dataset.drop = 'part2';
-        slot.dataset.word = w.word;
-        slot.dataset.syl = syl;
-        slot.dataset.filled = '0';
-        blanksWrap.appendChild(slot);
-        bankSyllables.push({ syl, word: w.word });
-      });
-
-      card.append(pic, blanksWrap);
-      cardsWrap.appendChild(card);
-      wordFillState[w.word] = { total: w.syl.length, filled: 0 };
+    const blanksWrap = document.createElement('div');
+    blanksWrap.className = 'fill-blanks';
+    w.syl.forEach((syl) => {
+      const slot = document.createElement('div');
+      slot.className = 'blank-slot';
+      slot.dataset.drop = 'part2';
+      slot.dataset.word = w.word;
+      slot.dataset.syl = syl;
+      slot.dataset.filled = '0';
+      blanksWrap.appendChild(slot);
+      bankSyllables.push({ syl, word: w.word });
     });
+
+    card.append(pic, blanksWrap);
+    cardsWrap.appendChild(card);
+    wordFillState[w.word] = { total: w.syl.length, filled: 0 };
     board2.appendChild(cardsWrap);
 
     const usedSyllables = new Set(bankSyllables.map((item) => item.syl));
@@ -466,7 +455,7 @@
       tileBank2.appendChild(tile);
     });
 
-    startTimer(timerChip2, timerValue2, 110);
+    startTimer(timerChip2, timerValue2, 25);
   }
 
   function handlePart2Drop(el, zone, item) {
@@ -502,15 +491,12 @@
       vibrate(30);
       updateScore(10);
 
-      part2Remaining -= 1;
-      if (part2Remaining <= 0) {
-        stopTimer(timerChip2);
-        setTimeout(() => {
-          part2RoundIdx += 1;
-          if (part2RoundIdx < PART2_ROUNDS.length) loadPart2Round(part2RoundIdx);
-          else goToPart3();
-        }, 700);
-      }
+      stopTimer(timerChip2);
+      setTimeout(() => {
+        part2WordIdx += 1;
+        if (part2WordIdx < PART2_WORDS.length) loadPart2Word(part2WordIdx);
+        else goToPart3();
+      }, 700);
     }
     return true;
   }
@@ -518,8 +504,8 @@
   function goToPart2() {
     showScreen(screenPart2);
     showToast('Bagian 2: Susun Kata! 🔤');
-    part2RoundIdx = 0;
-    loadPart2Round(0);
+    part2WordIdx = 0;
+    loadPart2Word(0);
   }
 
   // ---------- Bagian 3: Cari Kata ----------
@@ -564,6 +550,7 @@
   function markWordFound(word) {
     const item = wordList3.querySelector(`[data-word="${word}"]`);
     if (item) item.classList.add('is-found');
+    hudLabel3.textContent = `Bagian 3 · Cari Kata · ${foundWords.size}/${PART3_WORDS.length}`;
   }
 
   function finishSelection(e) {
@@ -629,6 +616,7 @@
     showScreen(screenPart3);
     showToast('Bagian 3: Cari Kata! 🔍');
     foundWords = new Set();
+    hudLabel3.textContent = `Bagian 3 · Cari Kata · 0/${PART3_WORDS.length}`;
     grid3.innerHTML = '';
 
     PART3_GRID.forEach((row, r) => {
@@ -685,8 +673,8 @@
     totalScore = 0;
     totalMistakes = 0;
     [scoreValue1, scoreValue2, scoreValue3].forEach((el) => { el.textContent = '0'; });
-    part1RoundIdx = 0;
-    part2RoundIdx = 0;
+    part1WordIdx = 0;
+    part2WordIdx = 0;
   }
 
   // ---------- Navigasi ----------

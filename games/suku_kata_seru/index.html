@@ -6,8 +6,21 @@
   <meta name="theme-color" content="#ff4fa0">
   <meta name="description" content="Suku Kata Seru — game edukasi membaca untuk anak: sambung, susun, dan cari kata dengan voiceover suku kata.">
   <title>Suku Kata Seru 📖</title>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      function setAppViewportHeight() {
+        var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+        root.style.setProperty('--app-vh', h + 'px');
+      }
+      setAppViewportHeight();
+      window.addEventListener('resize', setAppViewportHeight);
+      window.addEventListener('orientationchange', setAppViewportHeight);
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', setAppViewportHeight);
+    })();
+  </script>
   <link rel="preload" href="assets/Baloo2.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="style.css?v=1">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <main class="app" id="app">
@@ -107,6 +120,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </main>
-  <script src="game.js?v=1"></script>
+  <script src="game.js?v=2"></script>
 </body>
 </html>

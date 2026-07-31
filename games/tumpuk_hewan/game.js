@@ -43,10 +43,17 @@
   const STORAGE_SOUND = "dulinan_tumpuk_hewan_sound";
   const FIXED_STEP = 1 / 120;
   const MAX_FRAME = 1 / 18;
-  const BASE_GRAVITY = 820;
-  const PLATFORM_HEIGHT = 24;
-  const PLATFORM_SIDE_MARGIN = 18;
-  const AIM_SAFE_INSET = 4;
+  // Gravitasi lebih lembut agar jatuhan tidak “menembak” dan memantul.
+  const BASE_GRAVITY = 760;
+  // Collider platform tipis: hanya permukaan atas, bukan blok tebal yang
+  // membuat hewan menempel di sisi (edge terasa seperti hisapan friksi).
+  const PLATFORM_HEIGHT = 10;
+  const PLATFORM_TOP_OFFSET = -3;
+  const PLATFORM_SIDE_MARGIN = 14;
+  const AIM_SAFE_INSET = 2;
+  const REST_NORMAL_SPEED = 48;
+  const SOLVER_ITERATIONS = 8;
+  const VELOCITY_SOLVE_ITERATIONS = 3;
   const COLORS = {
     outline: "#244956",
     cream: "#fff7dc",
@@ -131,10 +138,12 @@
   }
 
   function makeStaticPlatform() {
+    // y diletakkan agar permukaan atas platform tetap di PLATFORM_TOP_OFFSET
+    // (selaras dengan visual rumput), sementara tebal fisik tetap tipis.
     return {
       id: "platform",
       x: view.centerX,
-      y: PLATFORM_HEIGHT / 2 - 3,
+      y: PLATFORM_TOP_OFFSET + PLATFORM_HEIGHT / 2,
       width: view.platformWidth,
       height: PLATFORM_HEIGHT,
       angle: 0,
@@ -143,9 +152,9 @@
       angularVelocity: 0,
       invMass: 0,
       invInertia: 0,
-      // Platform sengaja benar-benar statis dan tidak memantulkan hewan.
+      // Tanpa pantulan; friksi cukup untuk grip tanpa “lem” di tepi.
       restitution: 0,
-      friction: 0.94,
+      friction: 0.72,
       isStatic: true
     };
   }
@@ -273,9 +282,10 @@
   }
 
   function createBody(animal, x, y) {
-    const mass = clamp((animal.width * animal.height) / 3300, .85, 1.8);
-    // Inersia tambahan membuat hewan lebih sulit terpelanting/berputar.
-    const inertia = mass * (animal.width ** 2 + animal.height ** 2) / 12 * 1.35;
+    const mass = clamp((animal.width * animal.height) / 3300, .9, 1.7);
+    // Inersia sedikit dinaikkan agar stack stabil, tapi masih bisa miring
+    // secara natural saat pusat massa lewat tepi tumpuan.
+    const inertia = mass * (animal.width ** 2 + animal.height ** 2) / 12 * 1.18;
     return {
       id: `animal-${state.bodyCounter += 1}`,
       animal,
@@ -285,14 +295,14 @@
       height: animal.height,
       angle: 0,
       vx: 0,
-      vy: 20,
+      vy: 12,
       angularVelocity: 0,
       mass,
       invMass: 1 / mass,
       inertia,
       invInertia: 1 / inertia,
       restitution: 0,
-      friction: .82,
+      friction: .58,
       isStatic: false,
       touching: false,
       hasLanded: false,
@@ -584,6 +594,41 @@
     };
   }
 
+  // Tumpuan platform hanya di permukaan atas. Kontak di-clamp ke tepi kiri/kanan
+  // agar momen torsi muncul saat pusat massa lewat edge (hewan jatuh natural,
+  // bukan menempel di dinding platform lewat friksi samping).
+  function detectPlatformCollision(body) {
+    const vertices = bodyVertices(body);
+    const top = platform.y - platform.height / 2;
+    const left = platform.x - platform.width / 2;
+    const right = platform.x + platform.width / 2;
+
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const vertex of vertices) {
+      minX = Math.min(minX, vertex.x);
+      maxX = Math.max(maxX, vertex.x);
+      maxY = Math.max(maxY, vertex.y);
+    }
+
+    if (maxX <= left || minX >= right) return null;
+
+    const penetration = maxY - top;
+    // Belum menyentuh permukaan, atau sudah jauh di bawah (jatuh lewat).
+    if (penetration <= 0 || penetration > body.height * 1.35 + 18) return null;
+    // Abaikan jika pusat massa sudah jauh di bawah permukaan (bukan landing).
+    if (body.y - top > body.height * .85) return null;
+
+    // Titik tumpu di-clamp ke edge platform → torsi tipping yang realistis.
+    const contactX = clamp(body.x, left, right);
+    return {
+      normal: { x: 0, y: -1 },
+      penetration,
+      contact: { x: contactX, y: top }
+    };
+  }
+
   function velocityAt(body, point) {
     const radius = { x: point.x - body.x, y: point.y - body.y };
     return {
@@ -599,12 +644,14 @@
     body.angularVelocity += cross(radius, impulse) * body.invInertia * direction;
   }
 
-  function resolveCollision(bodyA, bodyB, collision, emitEffects) {
+  function resolveCollision(bodyA, bodyB, collision, emitEffects, options = {}) {
+    const velocitySolve = options.velocitySolve !== false;
     const totalInvMass = bodyA.invMass + bodyB.invMass;
     if (totalInvMass === 0) return;
 
-    const slop = .035;
-    const percent = .72;
+    // Koreksi posisi lebih lembut → kurangi “tendangan” yang terasa seperti bounce.
+    const slop = .04;
+    const percent = .55;
     const correctionMagnitude = Math.max(collision.penetration - slop, 0) / totalInvMass * percent;
     const correction = {
       x: collision.normal.x * correctionMagnitude,
@@ -620,6 +667,8 @@
       bodyB.y += correction.y * bodyB.invMass;
     }
 
+    if (!velocitySolve) return;
+
     const radiusA = { x: collision.contact.x - bodyA.x, y: collision.contact.y - bodyA.y };
     const radiusB = { x: collision.contact.x - bodyB.x, y: collision.contact.y - bodyB.y };
     const velocityA = velocityAt(bodyA, collision.contact);
@@ -630,6 +679,7 @@
     if (emitEffects && normalSpeed < -70) {
       emitImpact(collision.contact, -normalSpeed);
     }
+    // Sudah saling menjauh — jangan dorong lagi (sumber bounce palsu).
     if (normalSpeed > 0) return;
 
     const radiusCrossNormalA = cross(radiusA, collision.normal);
@@ -637,7 +687,11 @@
     const normalDenominator = totalInvMass
       + radiusCrossNormalA ** 2 * bodyA.invInertia
       + radiusCrossNormalB ** 2 * bodyB.invInertia;
-    const restitution = Math.min(bodyA.restitution, bodyB.restitution);
+
+    // Kontak diam: matikan restitution supaya stack tidak “menggelinding” naik.
+    let restitution = Math.min(bodyA.restitution, bodyB.restitution);
+    if (-normalSpeed < REST_NORMAL_SPEED) restitution = 0;
+
     const normalImpulseSize = -(1 + restitution) * normalSpeed / Math.max(normalDenominator, .0001);
     const normalImpulse = {
       x: collision.normal.x * normalImpulseSize,
@@ -646,6 +700,22 @@
 
     applyImpulse(bodyA, normalImpulse, radiusA, -1);
     applyImpulse(bodyB, normalImpulse, radiusB, 1);
+
+    // Tanpa pantulan: potong sisa kecepatan memisah di sepanjang normal.
+    if (restitution === 0) {
+      const afterA = velocityAt(bodyA, collision.contact);
+      const afterB = velocityAt(bodyB, collision.contact);
+      const afterNormal = dot({ x: afterB.x - afterA.x, y: afterB.y - afterA.y }, collision.normal);
+      if (afterNormal > 0) {
+        const kill = afterNormal / Math.max(normalDenominator, .0001);
+        const killImpulse = {
+          x: collision.normal.x * kill,
+          y: collision.normal.y * kill
+        };
+        applyImpulse(bodyA, killImpulse, radiusA, 1);
+        applyImpulse(bodyB, killImpulse, radiusB, -1);
+      }
+    }
 
     const newVelocityA = velocityAt(bodyA, collision.contact);
     const newVelocityB = velocityAt(bodyB, collision.contact);
@@ -669,7 +739,7 @@
       + radiusCrossTangentB ** 2 * bodyB.invInertia;
     let frictionImpulseSize = -dot(newRelative, tangent) / Math.max(tangentDenominator, .0001);
     const friction = Math.sqrt(bodyA.friction * bodyB.friction);
-    const maxFriction = normalImpulseSize * friction;
+    const maxFriction = Math.abs(normalImpulseSize) * friction;
     frictionImpulseSize = clamp(frictionImpulseSize, -maxFriction, maxFriction);
     const frictionImpulse = {
       x: tangent.x * frictionImpulseSize,
@@ -684,20 +754,23 @@
     for (const body of state.bodies) {
       body.touching = false;
       body.vy += gravity * step;
-      body.vx *= Math.pow(.9985, step * 60);
-      body.angularVelocity *= Math.pow(.997, step * 60);
+      body.vx *= Math.pow(.9988, step * 60);
+      body.angularVelocity *= Math.pow(.998, step * 60);
       body.x += body.vx * step;
       body.y += body.vy * step;
       body.angle += body.angularVelocity * step;
     }
 
-    for (let iteration = 0; iteration < 7; iteration += 1) {
+    for (let iteration = 0; iteration < SOLVER_ITERATIONS; iteration += 1) {
+      const velocitySolve = iteration < VELOCITY_SOLVE_ITERATIONS;
+      const emitEffects = iteration === 0;
+
       for (const body of state.bodies) {
-        const collision = detectCollision(platform, body);
+        const collision = detectPlatformCollision(body);
         if (collision) {
           body.touching = true;
           body.hasLanded = true;
-          resolveCollision(platform, body, collision, iteration === 0);
+          resolveCollision(platform, body, collision, emitEffects, { velocitySolve });
         }
       }
 
@@ -711,18 +784,22 @@
           bodyB.touching = true;
           bodyA.hasLanded = true;
           bodyB.hasLanded = true;
-          resolveCollision(bodyA, bodyB, collision, iteration === 0);
+          resolveCollision(bodyA, bodyB, collision, emitEffects, { velocitySolve });
         }
       }
     }
 
     for (const body of state.bodies) {
       if (body.touching) {
-        body.vx *= Math.pow(.975, step * 120);
-        body.angularVelocity *= Math.pow(.96, step * 120);
-        if (Math.abs(body.vy) < 3.2) body.vy = 0;
-        if (Math.abs(body.vx) < .4) body.vx = 0;
-        if (Math.abs(body.angularVelocity) < .005) body.angularVelocity = 0;
+        // Hapus sisa pantulan ke atas; biarkan rotasi/tipping tetap hidup.
+        if (body.vy < 0) {
+          body.vy = body.vy > -55 ? 0 : body.vy * .2;
+        }
+        body.vx *= Math.pow(.982, step * 120);
+        body.angularVelocity *= Math.pow(.988, step * 120);
+        if (Math.abs(body.vy) < 2.5) body.vy = 0;
+        if (Math.abs(body.vx) < .35) body.vx = 0;
+        if (Math.abs(body.angularVelocity) < .004) body.angularVelocity = 0;
       }
     }
 
@@ -822,15 +899,15 @@
 
     const maxLinearSpeed = Math.max(...state.bodies.map((body) => Math.hypot(body.vx, body.vy)), 0);
     const maxAngularSpeed = Math.max(...state.bodies.map((body) => Math.abs(body.angularVelocity)), 0);
-    const stable = state.droppedBody.hasLanded && maxLinearSpeed < 30 && maxAngularSpeed < .4;
+    const stable = state.droppedBody.hasLanded && maxLinearSpeed < 26 && maxAngularSpeed < .35;
     if (stable) {
       state.settleTime += delta;
     } else {
-      state.settleTime = Math.max(0, state.settleTime - delta * .6);
+      state.settleTime = Math.max(0, state.settleTime - delta * .55);
     }
 
-    if (state.settleTime > .28
-      || (state.dropElapsed > 2.8 && state.droppedBody.hasLanded && maxLinearSpeed < 44 && maxAngularSpeed < .8)) {
+    if (state.settleTime > .24
+      || (state.dropElapsed > 2.5 && state.droppedBody.hasLanded && maxLinearSpeed < 40 && maxAngularSpeed < .7)) {
       finishLanding();
     }
   }
@@ -1656,9 +1733,12 @@
       next: state.nextAnimal?.id || null,
       gravity: BASE_GRAVITY,
       platformWidth: platform.width,
+      platformHeight: platform.height,
       platformStatic: platform.isStatic,
       platformRestitution: platform.restitution,
-      droppedRestitution: state.droppedBody?.restitution ?? null
+      platformFriction: platform.friction,
+      droppedRestitution: state.droppedBody?.restitution ?? null,
+      droppedFriction: state.droppedBody?.friction ?? null
     }),
     start: resetGame,
     dropAt: (ratio = .5) => {

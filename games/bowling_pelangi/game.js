@@ -8,6 +8,11 @@
   const TAU = Math.PI * 2;
   const RAINBOW = ["#ed35d6", "#258ed8", "#42c9f3", "#48e266", "#fff143", "#ff9d2f", "#f03c4d"];
   const CONFETTI_COLORS = ["#ffec4a", "#3de1d1", "#ff6978", "#68ed77", "#fff", "#b44ff2"];
+  const ROLL_APPROACH_DURATION = 1.05; // detik: bola meluncur menuju pin (dulu ~0.77s dan terasa terlalu cepat)
+  const ROLL_IMPACT_DURATION = .5; // detik: bola menembus barisan pin setelah tumbukan
+  const IMPACT_PROGRESS = .74; // progres saat bola menyentuh pin
+  const PIN_IMPACT_OFFSET = 5; // jarak bola dari garis depan pin saat tumbukan
+  const PIN_PLOW_OFFSET = -25; // bola tetap menggelinding masuk ke tengah barisan pin setelah menabrak
 
   const $ = (id) => document.getElementById(id);
   const canvas = $("gameCanvas");
@@ -59,6 +64,11 @@
     ballProgress: 0,
     ballSpin: 0,
     rollSpeed: 0,
+    rollElapsed: 0,
+    ballWobble: 0,
+    ballSquash: 0,
+    ballBounce: 0,
+    driftSeed: 0,
     dragging: false,
     pointerId: null,
     pins: [],
@@ -91,6 +101,10 @@
 
   function easeOutCubic(value) {
     return 1 - ((1 - value) ** 3);
+  }
+
+  function easeInOutCubic(value) {
+    return value < .5 ? 4 * value * value * value : 1 - ((-2 * value + 2) ** 3) / 2;
   }
 
   function readBest() {
@@ -237,6 +251,11 @@
     state.ballProgress = 0;
     state.ballSpin = 0;
     state.rollSpeed = 0;
+    state.rollElapsed = 0;
+    state.ballWobble = 0;
+    state.ballSquash = 0;
+    state.ballBounce = 0;
+    state.driftSeed = 0;
     state.impactDone = false;
     state.knockedThisRound = 0;
     state.waitUntil = 0;
@@ -270,6 +289,10 @@
     state.phase = "rolling";
     state.ballProgress = 0;
     state.rollSpeed = 0;
+    state.rollElapsed = 0;
+    state.ballSquash = 0;
+    state.ballBounce = 0;
+    state.driftSeed = (Math.random() - .5) * 2;
     state.impactDone = false;
     setControlsVisible(false);
     playRollSound();
@@ -279,6 +302,8 @@
   function resolveImpact() {
     if (state.impactDone) return;
     state.impactDone = true;
+    state.ballSquash = 1;
+    state.ballBounce = 9;
 
     const accuracy = Math.abs(state.ballX);
     let targetCount;
@@ -465,14 +490,35 @@
     });
 
     if (state.shake > .05) state.shake *= Math.pow(.025, delta);
+    if (state.ballSquash > 0) state.ballSquash = Math.max(0, state.ballSquash - delta * 4.2);
+    if (Math.abs(state.ballBounce) > .05) {
+      state.ballBounce = lerp(state.ballBounce, 0, clamp(delta * 5.5, 0, 1));
+    } else {
+      state.ballBounce = 0;
+    }
 
     if (state.phase === "rolling") {
-      state.rollSpeed = Math.min(1.7, state.rollSpeed + delta * 2.2);
-      state.ballProgress = Math.min(1, state.ballProgress + delta * (.62 + state.rollSpeed * .28));
-      state.ballSpin += delta * (9 + state.rollSpeed * 7);
+      state.rollElapsed += delta;
 
-      if (state.ballProgress >= .79 && !state.impactDone) resolveImpact();
-      if (state.ballProgress >= 1) finishThrow(now);
+      if (!state.impactDone) {
+        // Bola berakselerasi lembut menuju pin, tidak langsung melompat ke kecepatan penuh.
+        const approachT = clamp(state.rollElapsed / ROLL_APPROACH_DURATION, 0, 1);
+        state.rollSpeed = lerp(state.rollSpeed, 1, clamp(delta * 4, 0, 1));
+        state.ballProgress = easeInOutCubic(approachT) * IMPACT_PROGRESS;
+        if (approachT >= 1) resolveImpact();
+      } else {
+        // Setelah menabrak, bola melambat karena "menembus" pin yang berjatuhan.
+        const impactT = clamp((state.rollElapsed - ROLL_APPROACH_DURATION) / ROLL_IMPACT_DURATION, 0, 1);
+        state.rollSpeed = lerp(state.rollSpeed, .3, clamp(delta * 5, 0, 1));
+        state.ballProgress = IMPACT_PROGRESS + (1 - IMPACT_PROGRESS) * easeOutCubic(impactT);
+        if (impactT >= 1) finishThrow(now);
+      }
+
+      state.ballSpin += delta * (6 + state.rollSpeed * 8);
+
+      // Efek fisika: bola sedikit oleng/bergeser saat menggelinding, mereda saat mendekati pin.
+      const wobbleFalloff = 1 - clamp(state.ballProgress / IMPACT_PROGRESS, 0, 1);
+      state.ballWobble = Math.sin(state.rollElapsed * 6.4) * .022 * wobbleFalloff * state.driftSeed;
     } else if (state.phase === "settling" && now >= state.waitUntil) {
       advanceRound();
     }
@@ -718,8 +764,14 @@
 
   function currentBallY() {
     if (state.phase !== "rolling") return view.ballStartY;
-    const travel = easeInCubic(state.ballProgress * .85) * .68 + state.ballProgress * .32;
-    return lerp(view.ballStartY, view.pinStartY + 5, travel);
+
+    if (state.ballProgress <= IMPACT_PROGRESS) {
+      const approachT = clamp(state.ballProgress / IMPACT_PROGRESS, 0, 1);
+      return lerp(view.ballStartY, view.pinStartY + PIN_IMPACT_OFFSET, approachT) + state.ballBounce;
+    }
+
+    const plowT = clamp((state.ballProgress - IMPACT_PROGRESS) / (1 - IMPACT_PROGRESS), 0, 1);
+    return lerp(view.pinStartY + PIN_IMPACT_OFFSET, view.pinStartY + PIN_PLOW_OFFSET, plowT) + state.ballBounce;
   }
 
   function currentBallRadius() {
@@ -758,15 +810,19 @@
 
   function drawBall() {
     const y = currentBallY();
-    const x = laneX(state.ballX, y);
+    const renderBallX = state.ballX + (state.phase === "rolling" ? state.ballWobble : 0);
+    const x = laneX(renderBallX, y);
     const radius = currentBallRadius();
     const rotation = state.phase === "rolling" ? state.ballSpin : state.ballX * 1.8;
 
-    if (state.phase === "rolling") drawBallTrail(x, y, radius);
+    if (state.phase === "rolling") drawBallTrail(renderBallX, y, radius);
 
     context.save();
     context.translate(x, y);
     context.rotate(rotation);
+    const squashX = 1 + state.ballSquash * .24;
+    const squashY = 1 - state.ballSquash * .24;
+    context.scale(squashX, squashY);
 
     context.fillStyle = "rgba(63,16,96,.3)";
     context.beginPath();
@@ -806,11 +862,11 @@
     context.restore();
   }
 
-  function drawBallTrail(x, y, radius) {
+  function drawBallTrail(ballWorldX, y, radius) {
     for (let index = 4; index >= 1; index -= 1) {
       const amount = index / 4;
       const trailY = y + index * radius * 1.05;
-      const trailX = laneX(state.ballX, trailY);
+      const trailX = laneX(ballWorldX, trailY);
       context.globalAlpha = .08 + (1 - amount) * .09;
       context.fillStyle = RAINBOW[(index + Math.floor(state.ballSpin)) % RAINBOW.length];
       context.beginPath();
@@ -946,8 +1002,8 @@
   }
 
   function playRollSound() {
-    tone(150, .7, "sine", .035, 0, 65);
-    tone(260, .48, "triangle", .02, .18, 110);
+    tone(150, 1.05, "sine", .035, 0, 65);
+    tone(260, .7, "triangle", .02, .22, 110);
   }
 
   function playHitSound(count) {
